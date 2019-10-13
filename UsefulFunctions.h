@@ -1,0 +1,9 @@
+
+#ifndef ADJACENTLIST_USEFULFUNCTIONS_H
+#define ADJACENTLIST_USEFULFUNCTIONS_H
+#include "Node.h"
+#include <vector>
+
+
+
+#endif //ADJACENTLIST_USEFULFUNCTIONS_H
