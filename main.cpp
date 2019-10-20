@@ -11,8 +11,8 @@ int main(int argc, char * argv[]) {
 
     auto nodos = l1.cargar_datos("nodos.vtk");
 
-    for (int i = 0; i < nodos.size(); ++i){
-        nodos[i]->print_coordinates();
+    for (auto & nodo : nodos){
+        nodo->print_coordinates();
     }
 
     return 0;
