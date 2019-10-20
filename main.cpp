@@ -5,14 +5,31 @@
 using namespace std;
 
 int main(int argc, char * argv[]) {
+
+    ifstream check("nodos_antiguos.vtk");
+    bool prev;
+    if ( check.fail() ){
+        cout << "No existe previo archivo." << endl;
+        system("cp nodos.vtk nodos_antiguos.vtk");
+        prev = false;
+    } else {
+        cout << "Existe previo archivo." << endl;
+        prev = true;
+    }
+
+    string path = prev ? "nodos_antiguos.vtk" : "nodos.vtk";
+
+    cout << "path: " << path << endl;
+
+    ifstream myfile (path);
+
     vector < Node<int, Coordinate2D>* > nodos;
     int cantidad_de_nodos = 0;
     string cantidad;
     string line;
-    ifstream myfile ("test.vtk");
     char separador = ' ';
 
-    if (myfile.is_open()) {
+    if ( myfile.is_open() ) {
         for (int i = 0; i < 5; ++i)
             getline(myfile, line);
 
@@ -40,13 +57,13 @@ int main(int argc, char * argv[]) {
 
         //Linea vacia
         getline(myfile, line);
-
+/*
         //TODO: Realizar las conexiones de los nodos
         while ( getline (myfile,line) ) {
             cout << "line: " << line << '\n';
         }
 
-
+*/
         myfile.close();
 
     } else {
