@@ -6,6 +6,8 @@
 #define ADJACENTLIST_NODE_H
 
 #include <iostream>
+#include <vector>
+#include <random>
 
 #include "Coordinates.h"
 
@@ -19,6 +21,16 @@ struct Node<T, Coordinate2D> {
     T value;
     typedef Coordinate2D coordinate_type;
     coordinate_type coordinate;
+
+    void print_coordinates () {
+        cout << "x: " << coordinate.x << ", y: " << coordinate.y << endl;
+    }
+
+    Node(float x, float y){
+        srand(time(nullptr));
+        value = (rand()%1000)+1;
+        coordinate = Coordinate2D(x, y);
+    }
 
     explicit Node(T value, float x, float y): value{value} {
         coordinate = Coordinate2D(x, y);

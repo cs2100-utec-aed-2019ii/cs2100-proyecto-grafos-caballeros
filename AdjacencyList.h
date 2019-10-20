@@ -1,7 +1,6 @@
 #ifndef ADJACENTLIST_ADJACENCYLIST_H
 #define ADJACENTLIST_ADJACENCYLIST_H
 
-#include <vector>
 #include <iterator>
 #include <list>
 
@@ -22,16 +21,17 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
     typedef node_type Node;
     unsigned int size = 0;
 
-    vector < vector<Node> > * adjacency_list = new vector < vector<Node> >;
+    vector<vector<Node>>* adjacency_list = new vector < vector<Node> >;
 
     /// CONSTRUCTURES POR DEFECTO
     AdjacencyList() {
         vector<Node> aux;
         adjacency_list->push_back(aux);
     }
+
     ~AdjacencyList() = default;
 
-    void insert_node(Node* node){
+    void insert_node(Node* node) {
 
         adjacency_list_matrix[size].push_back(*node);
         ++size;
@@ -42,19 +42,19 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
     void link_node(Node* node_from, Node* node_to) {
 
         for (int i = 0; i < size; ++i) {
-
             if ( adjacency_list_matrix[i][0] == *node_from ) {
-
                 adjacency_list_matrix[i].push_back(*node_to);
-
                 goto Exit;
             }
-
         }
 
         Exit:
 
         cout << "Node linked" << endl;
+    }
+
+    vector<vector<Node>> get_matrix() {
+        return adjacency_list_matrix;
     }
 
     void print_adjacency_list() {
@@ -73,8 +73,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 
 
-        for(auto it = adjacency_list_matrix.begin(); it != adjacency_list_matrix.end()-1; ++it) {
-
+        for (auto it = adjacency_list_matrix.begin(); it != adjacency_list_matrix.end()-1; ++it) {
             if(it[0][0] == *node) {
                 adjacency_list_matrix.erase(it);
                 goto End;
@@ -82,7 +81,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
         }
 
         End:
-
+        --size;
         cout << "Node deleted" << endl;
 
     }
