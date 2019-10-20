@@ -6,6 +6,7 @@ using namespace std;
 
 int main(int argc, char * argv[]) {
 
+    ///Revisar si existe un archivo previo
     ifstream check("nodos_antiguos.vtk");
     bool prev;
     if ( check.fail() ){
@@ -18,17 +19,14 @@ int main(int argc, char * argv[]) {
     }
 
     string path = prev ? "nodos_antiguos.vtk" : "nodos.vtk";
-
-    cout << "path: " << path << endl;
-
     ifstream myfile (path);
-
     vector < Node<int, Coordinate2D>* > nodos;
     int cantidad_de_nodos = 0;
     string cantidad;
     string line;
     char separador = ' ';
 
+    ///Lectura del .vtk
     if ( myfile.is_open() ) {
         for (int i = 0; i < 5; ++i)
             getline(myfile, line);
@@ -45,6 +43,7 @@ int main(int argc, char * argv[]) {
 
         cout << "Cantidad de nodos: " << cantidad_de_nodos << endl;
 
+        ///Crear los nodos y guardarlos en un vector
         for (int i = 0; i < cantidad_de_nodos; ++i) {
             getline(myfile, line);
             auto node = new Node<int, Coordinate2D>(line);
@@ -55,7 +54,7 @@ int main(int argc, char * argv[]) {
             nodos[i]->print_coordinates();
         }
 
-        //Linea vacia
+        /// Borrar linea vacia
         getline(myfile, line);
 /*
         //TODO: Realizar las conexiones de los nodos
