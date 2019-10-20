@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <random>
 
 #include "Coordinates.h"
 
@@ -21,23 +22,14 @@ struct Node<T, Coordinate2D> {
     typedef Coordinate2D coordinate_type;
     coordinate_type coordinate;
 
-    explicit Node(const string &values){
-        int cantidad_de_coordenadas = (values.size()==5 ? 3 : 2);
-        string valor;
-        double valor_;
-        vector<double> coordinates;
-        char separador = ' ';
-
-        for(size_t p = 0, q = 0, i = 0; i < cantidad_de_coordenadas; p = q, i++) {
-            valor = values.substr(p+(p!=0),(q=values.find(separador, p+1))-p-(p!=0));
-            valor_ = stod(valor);
-            coordinates.push_back(valor_);
-        }
-        coordinate = Coordinate2D(coordinates[0], coordinates[1]);
-    }
-
     void print_coordinates () {
         cout << "x: " << coordinate.x << ", y: " << coordinate.y << endl;
+    }
+
+    Node(float x, float y){
+        srand(time(nullptr));
+        value = (rand()%1000)+1;
+        coordinate = Coordinate2D(x, y);
     }
 
     explicit Node(T value, float x, float y): value{value} {
