@@ -86,6 +86,7 @@ void insert_node_by_address(Node* node) {
         }
     }
 
+
 void insert_node_by_value(typename node_type::n_type value) {
         Node * node = new Node(value);
         if (size == 0) {
@@ -140,7 +141,6 @@ void insert_node_by_value(typename node_type::n_type value) {
             }
         }
     }
-
 
 
 //--------------------------------------------------------------------------
@@ -224,7 +224,83 @@ void link_node_by_value(typename node_type::n_type value_from, typename node_typ
 }
 
 
-    void link_node_by_address(Node* node_from, Node* node_to) {
+void link_node_by_position(int position_from, int position_to) {
+        int p1 = position_from;
+        int p2 = position_to;
+
+        auto node_from = &adjacency_list_matrix[p1][0];
+        auto node_to = &adjacency_list_matrix[p2][0];
+
+        int l = 0;
+        int pos = 0;
+        int r = size;
+        while (l <= r){
+            int m = l + (r-l)/2;
+
+            if (adjacency_list_matrix[m][0] == *node_from)
+                pos = m;
+
+            if (adjacency_list_matrix[m][0] < *node_from)
+                l = m + 1;
+
+            else
+                r = m - 1;
+        }
+
+        if(adjacency_list_matrix[pos].size() == 1){
+            adjacency_list_matrix[pos].push_back(*node_to);
+
+        }
+
+        else{
+            int pos1 = 0;
+            int l1 = 0;
+            int r1 = adjacency_list_matrix[pos].size();
+            if(*node_to > adjacency_list_matrix[pos][r1-1]){
+                pos1 = r1-1;
+            }
+            else if(*node_to < adjacency_list_matrix[pos][1]){
+                pos1 = -1;
+            }
+            else{
+                while (l1 <= r1) {
+                    int m1 = l1 + (r1 - l1) / 2;
+                    if (adjacency_list_matrix[pos][m1] < *node_to && adjacency_list_matrix[pos][m1+1] > *node_to) {
+                        pos1 = m1;
+                        goto Exit;
+                    }
+
+                    if (adjacency_list_matrix[pos][m1] < *node_to) {
+                        l1 = m1 + 1;
+                    }
+                    else {
+                        r1 = m1 - 1;
+                    }
+                }
+                cout<<"Node with same value already inserted"<<endl;
+                pos1 = -2;
+                goto Exit;
+            }
+            Exit:
+            if(pos1 == -1){
+                adjacency_list_matrix[pos].insert(adjacency_list_matrix[pos].begin()+1,*node_to);
+
+            }
+            else if (pos1 == -2){
+                cout << "Node not inserted" << endl;
+            }
+            else{
+                auto it = adjacency_list_matrix[pos].begin() +  (pos1 +1);
+                adjacency_list_matrix[pos].insert(it, *node_to);
+
+            }
+        }
+
+        cout << "Node linked" << endl;
+    }
+
+
+void link_node_by_address(Node* node_from, Node* node_to) {
             int l = 0;
             int pos = 0;
             int r = size;
@@ -294,7 +370,6 @@ void link_node_by_value(typename node_type::n_type value_from, typename node_typ
 }
 
 
-
 //--------------------------------------------------------------------------
 
 
@@ -302,12 +377,15 @@ void link_node_by_value(typename node_type::n_type value_from, typename node_typ
 
 vector<Node> nodes_linked_to_node(Node* node){
     vector<Node> aux;
-    int pos = 0;
+    bool check = false;
+    int pos = -1;
     if(*node == adjacency_list_matrix[0][0]){
         aux = adjacency_list_matrix[0];
+        pos = 0;
     }
     else if( *node == adjacency_list_matrix[size-1][0]){
         aux = adjacency_list_matrix[size-1];
+        pos = size-1;
     }
     else{
         int l = 0;
@@ -332,16 +410,23 @@ vector<Node> nodes_linked_to_node(Node* node){
             }
             Exit:
             aux = adjacency_list_matrix[pos];
+
         }
     }
 
 
-
-vector<Node> rtrn;
-    for(int i =1; i < aux.size(); i++){
-        rtrn.push_back(adjacency_list_matrix[pos][i]);
+    if( adjacency_list_matrix[pos].size() == 1){
+        cout << "Node passed has no linked nodes" << endl;
+        vector<Node> nonode;
+        return nonode;
     }
-    return rtrn;
+    else{
+        vector<Node> rtrn;
+        for(int i =1; i < aux.size(); i++){
+            rtrn.push_back(adjacency_list_matrix[pos][i]);
+        }
+        return rtrn;
+    }
 }
 
 //--------------------------------------------------------------------------
@@ -373,6 +458,8 @@ int search_node_by_address_returns_position(Node* nodo){
         }
 
 }
+
+
 int search_node_by_value_returns_position(typename node_type::n_type value){
     int pos = -1;
     int l = 0;
@@ -398,6 +485,7 @@ int search_node_by_value_returns_position(typename node_type::n_type value){
     }
 
 }
+
 
 Node* search_node_by_value_returns_address(typename node_type::n_type value){
         int p1 = search_node_by_value_returns_position(value);
@@ -428,7 +516,6 @@ Node* search_node_by_value_returns_address(typename node_type::n_type value){
         }
 
     }
-
 
 
 //--------------------------------------------------------------------------
@@ -503,6 +590,7 @@ void delete_connection_with_adresses(Node* node_from, Node* node_to){
 
 }
 
+
 void delete_connection_with_values(typename node_type::n_type node_from, typename node_type::n_type node_to){
         int l = 0;
         int pos = 0;
@@ -576,6 +664,7 @@ void delete_connection_with_values(typename node_type::n_type node_from, typenam
 
 
 //--------------------------------------------------------------------------DELETE NODE
+
 
 
 void delete_node_by_value(typename node_type::n_type node) {
@@ -765,11 +854,13 @@ void delete_node_by_address(Node* node) {
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------SMALL FUNCTIONS
-    vector<vector<Node>> get_matrix() {
+
+vector<vector<Node>> get_matrix() {
         return adjacency_list_matrix;
     }
 
-    void print_adjacency_list() {
+
+void print_adjacency_list() {
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < adjacency_list_matrix[i].size(); ++j) {
                 adjacency_list_matrix[i][j].print_value();
@@ -778,8 +869,6 @@ void delete_node_by_address(Node* node) {
         }
         cout<<endl;
     }
-
-
 
 //--------------------------------------------------------------------------
 
