@@ -299,14 +299,17 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 //--------------------------------------------------------------------------NODES LINKED TO NODE
 
-    vector<Node> nodes_linked_to_node(Node* node){
+    vector<Node> nodes_linked_to_node(Node* node) {
         vector<Node> aux;
-        int pos = 0;
+        bool check = false;
+        int pos = -1;
         if(*node == adjacency_list_matrix[0][0]){
             aux = adjacency_list_matrix[0];
+            pos = 0;
         }
         else if( *node == adjacency_list_matrix[size-1][0]){
             aux = adjacency_list_matrix[size-1];
+            pos = size-1;
         }
         else{
             int l = 0;
@@ -331,16 +334,23 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
                 }
                 Exit:
                 aux = adjacency_list_matrix[pos];
+
             }
         }
 
 
-
-        vector<Node> rtrn;
-        for(int i =1; i < aux.size(); i++){
-            rtrn.push_back(adjacency_list_matrix[pos][i]);
+        if (adjacency_list_matrix[pos].size() == 1) {
+//            cout << "Node passed has no linked nodes" << endl;
+            vector<Node> nonode;
+            return nonode;
         }
-        return rtrn;
+        else{
+            vector<Node> rtrn;
+            for(int i =1; i < aux.size(); i++){
+                rtrn.push_back(adjacency_list_matrix[pos][i]);
+            }
+            return rtrn;
+        }
     }
 
 //--------------------------------------------------------------------------

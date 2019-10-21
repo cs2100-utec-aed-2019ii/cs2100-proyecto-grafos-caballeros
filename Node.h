@@ -9,6 +9,7 @@
 #include <random>
 #include <ctime>
 #include <vector>
+
 #include "Macros.h"
 #include "Coordinates.h"
 
@@ -28,16 +29,14 @@ struct Node<T, Coordinate2D> {
         cout << "x: " << coordinate.x << ", y: " << coordinate.y << endl;
     }
 
-    Node(float x, float y){
-        srand(time(nullptr));
+    Node(float x, float y) {
         value = (rand()%1000)+1;
         coordinate = Coordinate2D(x, y);
     }
 
-    Node(T value_){
+    Node(T value_) {
         //TODO: Verificar que no haya superposición
         value = value_;
-        srand(time(nullptr));
         coordinate = Coordinate2D((rand()%WINDOW_WIDTH)+1, (rand()%WINDOW_HEIGHT)+1);
     }
 

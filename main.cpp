@@ -18,17 +18,19 @@ vector<vector<node_int_2D>> adj_mat;
 
 int main(int argc, char** argv) {
 
+    srand(time(nullptr));
+
     auto a = node_int_2D(3, 10, 10);
-    auto b = node_int_2D(4, 50, 50);
+    auto b = node_int_2D(4, 10, 50);
     auto c = node_int_2D(1, 100, 100);
 
-    al.insert_node(&a);
-    al.insert_node(&b);
-    al.insert_node(&c);
+    al.insert_node_by_address(&a);
+    al.insert_node_by_address(&b);
+    al.insert_node_by_address(&c);
 
-    al.link_node(&a,&c);
+    al.link_node_by_address(&a, &c);
 
-    al.link_node(&b, &a);
+    al.link_node_by_address(&b, &a);
 
     al.print_adjacency_list();
 
