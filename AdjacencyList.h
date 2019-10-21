@@ -85,6 +85,81 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
         }
     }
 
+    void link_node_by_position(int position_from, int position_to) {
+        int p1 = position_from;
+        int p2 = position_to;
+
+        auto node_from = &adjacency_list_matrix[p1][0];
+        auto node_to = &adjacency_list_matrix[p2][0];
+
+        int l = 0;
+        int pos = 0;
+        int r = size;
+        while (l <= r){
+            int m = l + (r-l)/2;
+
+            if (adjacency_list_matrix[m][0] == *node_from)
+                pos = m;
+
+            if (adjacency_list_matrix[m][0] < *node_from)
+                l = m + 1;
+
+            else
+                r = m - 1;
+        }
+
+        if(adjacency_list_matrix[pos].size() == 1){
+            adjacency_list_matrix[pos].push_back(*node_to);
+
+        }
+
+        else{
+            int pos1 = 0;
+            int l1 = 0;
+            int r1 = adjacency_list_matrix[pos].size();
+            if(*node_to > adjacency_list_matrix[pos][r1-1]){
+                pos1 = r1-1;
+            }
+            else if(*node_to < adjacency_list_matrix[pos][1]){
+                pos1 = -1;
+            }
+            else{
+                while (l1 <= r1) {
+                    int m1 = l1 + (r1 - l1) / 2;
+                    if (adjacency_list_matrix[pos][m1] < *node_to && adjacency_list_matrix[pos][m1+1] > *node_to) {
+                        pos1 = m1;
+                        goto Exit;
+                    }
+
+                    if (adjacency_list_matrix[pos][m1] < *node_to) {
+                        l1 = m1 + 1;
+                    }
+                    else {
+                        r1 = m1 - 1;
+                    }
+                }
+                cout<<"Node with same value already inserted"<<endl;
+                pos1 = -2;
+                goto Exit;
+            }
+            Exit:
+            if(pos1 == -1){
+                adjacency_list_matrix[pos].insert(adjacency_list_matrix[pos].begin()+1,*node_to);
+
+            }
+            else if (pos1 == -2){
+                cout << "Node not inserted" << endl;
+            }
+            else{
+                auto it = adjacency_list_matrix[pos].begin() +  (pos1 +1);
+                adjacency_list_matrix[pos].insert(it, *node_to);
+
+            }
+        }
+
+        cout << "Node linked" << endl;
+    }
+
     void insert_node_by_value(typename node_type::n_type value) {
         Node * node = new Node(value);
         if (size == 0) {
