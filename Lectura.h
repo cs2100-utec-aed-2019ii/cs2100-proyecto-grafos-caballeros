@@ -1,7 +1,11 @@
+//
+// Created by Gabriel Spranger Rojas on 10/19/19.
+//
+
 #ifndef GRAPHOS_LECTURA_H
 #define GRAPHOS_LECTURA_H
 
-#include <vector>
+#include <fstream>
 #include "Node.h"
 
 template <class node_type, class coordinate_type>
@@ -10,7 +14,7 @@ struct Lectura {};
 template <class node_type>
 struct Lectura<node_type, Coordinate2D> {
 
-    vector < node_type* > cargar_datos (const string& vtk_file) {
+    vector <node_type*> cargar_datos (const string& vtk_file) {
         ///Revisar si existe un archivo previo
         ifstream check("nodos_antiguos.vtk");
         bool prev;

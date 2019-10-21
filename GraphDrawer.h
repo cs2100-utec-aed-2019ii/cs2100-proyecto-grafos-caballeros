@@ -13,20 +13,37 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 
-#include "Macros.h"
 #include "AdjacencyList.h"
 
 template <typename graph_type, typename node_type>
 class GraphDrawer {};
 
 template <typename node_type>
-class GraphDrawer<adjacency_list_with_vector, node_type> {
-    adjacency_list_with_vector adjacencyList;
+class GraphDrawer <adjacency_list_with_vector, node_type> {
+    adjacency_list_with_vector adjacency_list;
+public:
+    explicit GraphDrawer(adjacency_list_with_vector al): adjacency_list{al} {}
 
     GLvoid initGL() {
         glClearColor(RED, GREEN, BLUE, ALPHA);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
+    }
+
+    static GLvoid key_pressed(unsigned char key, int x, int y) {
+        switch (key) { // qué tecla se ha presionado
+            case 'q':
+                exit(1);
+            default:
+                cout << key << " key pressed." << endl;
+                break;
+        }
+    }
+
+    static GLvoid mouse_click(int button, int state, int x, int y) {
+        if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
+            cout << "Left button pressed at x: " << x << " y: " << WINDOW_HEIGHT-y << endl;
+        }
     }
 
     static GLvoid window_display() {
@@ -48,22 +65,21 @@ class GraphDrawer<adjacency_list_with_vector, node_type> {
         glMatrixMode(GL_MODELVIEW);
     }
 
-public:
-    explicit GraphDrawer(adjacency_list_with_vector al): adjacencyList{al} {}
+//    void (GraphDrawer::*display_callback) () = &GraphDrawer::window_display;
 
     GLvoid initialize(int argc, char** argv) {
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
         glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT); // define window size
-        glutInitWindowPosition(200, 200); // donde se va a renderizar la pantalla
+        glutInitWindowPosition(700, 350); // donde se va a renderizar la pantalla
         glutCreateWindow("Graphos"); // titulo de la pantalla
         initGL(); // crear la ventana cargando la matriz identidad
         glEnable(GL_TEXTURE_2D); // habilitar funciones
         glutDisplayFunc(window_display);
         glutReshapeFunc(window_reshape);
-//        glutKeyboardFunc(&key_pressed);
+        glutKeyboardFunc(key_pressed);
 //        glutTimerFunc(DURATION, Timer, 1);
-//        glutMouseFunc(&mouse_click);
+        glutMouseFunc(mouse_click);
         glutMainLoop();
     }
 
