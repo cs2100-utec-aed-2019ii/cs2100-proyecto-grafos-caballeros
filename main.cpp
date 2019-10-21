@@ -73,16 +73,28 @@ GLvoid window_display() {
     glLoadIdentity();
     glOrtho(0.0f, WINDOW_WIDTH, 0.0f, WINDOW_HEIGHT, 0.0f, 100);
 
-    // Esto dibuja los nodos
+    // Esto dibuja los nodos O(V)
     for (unsigned i = 0; i < al.size; ++i) {
         glPushMatrix();
             glTranslatef(adj_mat[i][0].coordinate.x, adj_mat[i][0].coordinate.y, 0);
             glColor3f(0.8f, 0.5f, 0.2f);
+            // TODO: radius needs to depend on the amount of nodes
             glutWireSphere(5, 50, 10);
         glPopMatrix();
     }
 
-    // TODO: dibujar aristas
+    // Esto dibuja las aristas O(Vˆ2)
+    // TODO: preguntarle al profe si necesito ponerle glPushMatrix();
+    for (unsigned i = 0; i < al.size; ++i) {
+        node_int_2D starting_node = adj_mat[i][0]; // get NODE
+        vector<node_int_2D> nodes = al.nodes_linked_to_node(&starting_node); // get nodes linked to NODE
+        for (auto n : nodes) { // iterate through nodes linked to NODE
+            glBegin(GL_LINES);
+                glVertex2f(starting_node.coordinate.x, starting_node.coordinate.y);
+                glVertex2f(n.coordinate.x, n.coordinate.y);
+            glEnd();
+        }
+    }
 
     glutSwapBuffers();
     glFlush();

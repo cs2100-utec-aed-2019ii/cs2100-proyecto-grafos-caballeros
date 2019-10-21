@@ -8,8 +8,8 @@
 #define WINDOW_WIDTH 500
 #define WINDOW_HEIGHT 500
 
-#define WINDOW_X_POS 550
-#define WINDOW_Y_POS 250
+#define WINDOW_X_POS 500
+#define WINDOW_Y_POS 300
 
 #define RED 0
 #define GREEN 0

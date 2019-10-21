@@ -13,7 +13,6 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 
-#include "Macros.h"
 #include "AdjacencyList.h"
 
 template <typename graph_type, typename node_type>
