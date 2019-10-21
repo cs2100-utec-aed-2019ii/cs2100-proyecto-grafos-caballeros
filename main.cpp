@@ -17,45 +17,27 @@ int main(int argc, char** argv) {
     auto d = node_int_2D(2, 2, 1);
     auto f = node_int_2D(0,1,1);
     auto e = node_int_2D(5, 2, 11);
-    al.insert_node(&d);
-    al.insert_node(&a);
-    al.insert_node(&e);
-    al.insert_node(&b);
-    al.insert_node(&c);
-    al.insert_node(&f);
+    al.insert_node_by_address(&d);
 
-    al.link_node(&a,&b);
+    al.insert_node_by_address(&a);
 
-    al.link_node(&a,&c);
+    al.insert_node_by_address(&e);
 
-    al.link_node(&a,&e);
+    al.insert_node_by_address(&b);
 
-    al.link_node(&a,&f);
+    al.insert_node_by_address(&c);
 
-    al.link_node(&a,&d);
+    al.insert_node_by_address(&f);
 
+    al.link_node_by_value(3,1);
+
+    al.link_node_by_value(3,0);
 
     al.print_adjacency_list();
 
-
-
-    al.delete_node(&d);
+    al.delete_node_by_value(1);
 
     al.print_adjacency_list();
-
-    al.delete_node(&f);
-
-    al.print_adjacency_list();
-
-    al.delete_node(&e);
-
-    al.print_adjacency_list();
-
-    auto aux = al.nodes_linked_to_node(&a);
-
-    for (int i=0;i<aux.size();i++){
-        aux[i].print_value();
-    }
 
     return 0;
 }
