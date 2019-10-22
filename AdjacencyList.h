@@ -33,6 +33,8 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 //--------------------------------------------------------------------------INSERT NODE
 
 void insert_node_by_address(Node* node) {
+
+
         if (size == 0) {
             vector<Node> aux;
             aux.push_back(*node);
@@ -151,6 +153,8 @@ void insert_node_by_value(typename node_type::n_type value) {
 void link_node_by_value(typename node_type::n_type value_from, typename node_type::n_type value_to) {
         int p1 = search_node_by_value_returns_position(value_from);
         int p2 = search_node_by_value_returns_position(value_to);
+
+        if(p1 == -1 || p2 == -1){ return;}
 
         auto node_from = &adjacency_list_matrix[p1][0];
         auto node_to = &adjacency_list_matrix[p2][0];
@@ -434,6 +438,7 @@ vector<Node> nodes_linked_to_node(Node* node){
 //--------------------------------------------------------------------------SEARCH NODE
 
 int search_node_by_address_returns_position(Node* nodo){
+    if(size == 0){ return -1;}
     int pos = -1;
     int l = 0;
     int r = size;
@@ -461,33 +466,31 @@ int search_node_by_address_returns_position(Node* nodo){
 
 
 int search_node_by_value_returns_position(typename node_type::n_type value){
-    int pos = -1;
-    int l = 0;
-    int r = size;
-    while (l <= r) {
-        int m = l + (r - l) / 2;
+     int l = 0;
+     int r = size;
+     auto x = value;
+        if(value <= *adjacency_list_matrix[size-1][0] && value >= *adjacency_list_matrix[0][0]) {
+            while (l <= r) {
+                int m = l + (r - l) / 2;
 
-        if (*adjacency_list_matrix[m][0] == value)
-            pos = m;
+                if (*adjacency_list_matrix[m][0] == x)
+                    return m;
 
-        if (*adjacency_list_matrix[m][0] < value)
-            l = m + 1;
+                if (*adjacency_list_matrix[m][0] < x)
+                    l = m + 1;
 
-        else
-            r = m - 1;
-    }
-
-    if(pos > size-1){
-        return -1;
-    }
-    else{
-        return pos;
-    }
-
+                else
+                    r = m - 1;
+            }
+            return -1;
+        }
+        else{
+            return -1;
+        }
 }
 
 
-Node* search_node_by_value_returns_address(typename node_type::n_type value){
+    Node* search_node_by_value_returns_address(typename node_type::n_type value){
         int p1 = search_node_by_value_returns_position(value);
 
         int pos = -1;
@@ -517,6 +520,17 @@ Node* search_node_by_value_returns_address(typename node_type::n_type value){
 
     }
 
+Node* search_node_by_position_returns_address(int position){
+        int p1 = position;
+
+       if(position > size-1){
+           return nullptr;
+       }
+       else{
+           return &adjacency_list_matrix[position][0];
+       }
+
+    }
 
 //--------------------------------------------------------------------------
 
