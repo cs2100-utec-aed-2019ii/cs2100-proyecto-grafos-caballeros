@@ -21,16 +21,29 @@ struct Node {};
 template <typename T>
 struct Node<T, Coordinate2D> {
     T value;
+    long max_value;
     typedef T n_type;
     typedef Coordinate2D coordinate_type;
     coordinate_type coordinate;
 
+    Node() = default;
+
     void print_coordinates () {
-        cout << "x: " << coordinate.x << ", y: " << coordinate.y << endl;
+        cout << "x: " << coordinate.x << ", y: " << coordinate.y << ", value: " << value << endl;
+    }
+
+    void new_value () {
+        value = (rand()%max_value)+1;
+    }
+
+    Node(float x, float y, long max_value_) {
+        max_value = max_value_;
+        value = (rand()%max_value)+1;
+        coordinate = Coordinate2D(x, y);
     }
 
     Node(float x, float y) {
-        value = (rand()%1000)+1;
+        value = (rand()%max_value)+1;
         coordinate = Coordinate2D(x, y);
     }
 
@@ -52,7 +65,7 @@ struct Node<T, Coordinate2D> {
         return value;
     }
 
-    T get_value() { return value; }
+    T get_value(){ return value;}
 
     bool operator<(const Node<T, Coordinate2D> &rhs) const {
         return value < rhs.value;

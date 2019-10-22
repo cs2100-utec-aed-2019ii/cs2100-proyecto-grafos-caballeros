@@ -1,7 +1,8 @@
 #define node_int_2D Node<int, Coordinate2D>
 #define GL_SILENCE_DEPRECATION
 
-#include "AdjacencyList.h"
+
+#include "Lectura.h"
 
 #define adjacency_list_with_node_int_2D_and_vectorized AdjacencyList<node_int_2D, vectorized>
 
@@ -12,35 +13,34 @@ GLvoid key_pressed(unsigned char key, int x, int y);
 GLvoid mouse_click(int button, int state, int x, int y);
 GLvoid window_display();
 GLvoid window_reshape(GLsizei width, GLsizei height);
-GLvoid initialize(int argc, char** argv);
+GLvoid draw_graph(int argc, char** argv);
+void show_menu();
 
-AdjacencyList<node_int_2D, vectorized> al;
+AdjacencyList<node_int_2D, vectorized>* al;
 vector<vector<node_int_2D>> adj_mat;
 
 int main(int argc, char** argv) {
 
     srand(time(nullptr));
 
-    auto a = node_int_2D(3, 10, 10);
-    auto b = node_int_2D(4, 10, 50);
-    auto c = node_int_2D(1, 100, 100);
+    Lectura<node_int_2D, Coordinate2D> l1;
 
-    al.insert_node_by_address(&a);
-    al.insert_node_by_address(&b);
-    al.insert_node_by_address(&c);
-
-    al.link_node_by_address(&a, &c);
-
-    al.link_node_by_address(&b, &a);
-
-    al.print_adjacency_list();
-
-    adj_mat = al.get_matrix();
+    ///Adjacency list
+    al = l1.cargar_datos("nodos.vtk");
+    al->print_adjacency_list();
+    adj_mat = al->get_matrix();
 
     // Dibujar grafo
-    initialize(argc, argv);
+    draw_graph(argc, argv);
+
+    // Mostrar menú para insertar y/o borrar nodos
+    show_menu();
 
     return 0;
+}
+
+void show_menu() {
+    // TODO: menu with options for insertion and deletion
 }
 
 GLvoid initGL() {
@@ -52,6 +52,7 @@ GLvoid initGL() {
 GLvoid key_pressed(unsigned char key, int x, int y) {
     switch (key) { // qué tecla se ha presionado
         case 'q':
+            delete al;
             exit(1);
         default:
             cout << key << " key pressed." << endl;
@@ -72,7 +73,7 @@ GLvoid window_display() {
     glOrtho(0.0f, WINDOW_WIDTH, 0.0f, WINDOW_HEIGHT, 0.0f, 100);
 
     // Esto dibuja los nodos O(V)
-    for (unsigned i = 0; i < al.size; ++i) {
+    for (unsigned i = 0; i < al->size; ++i) {
         glPushMatrix();
             glTranslatef(adj_mat[i][0].coordinate.x, adj_mat[i][0].coordinate.y, 0);
             glColor3f(SPHERE_RED, SPHERE_GREEN, SPHERE_BLUE);
@@ -83,9 +84,9 @@ GLvoid window_display() {
 
     // Esto dibuja las aristas O(Vˆ2)
     // TODO: preguntarle al profe si necesito ponerle glPushMatrix();
-    for (unsigned i = 0; i < al.size; ++i) {
+    for (unsigned i = 0; i < al->size; ++i) {
         node_int_2D starting_node = adj_mat[i][0]; // get NODE
-        vector<node_int_2D> nodes = al.nodes_linked_to_node(&starting_node); // get nodes linked to NODE
+        vector<node_int_2D> nodes = al->nodes_linked_to_node(&starting_node); // get nodes linked to NODE
         for (auto n : nodes) { // iterate through nodes linked to NODE
             glBegin(GL_LINES);
                 glVertex2f(starting_node.coordinate.x, starting_node.coordinate.y);
@@ -105,7 +106,7 @@ GLvoid window_reshape(GLsizei width, GLsizei height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-GLvoid initialize(int argc, char** argv) {
+GLvoid draw_graph(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT); // define window size
