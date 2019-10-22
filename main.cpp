@@ -1,6 +1,7 @@
 #define node_int_2D Node<int, Coordinate2D>
+#define GL_SILENCE_DEPRECATION
 
-#include "GraphDrawer.h"
+#include "AdjacencyList.h"
 
 #define adjacency_list_with_node_int_2D_and_vectorized AdjacencyList<node_int_2D, vectorized>
 
@@ -34,14 +35,9 @@ int main(int argc, char** argv) {
 
     al.print_adjacency_list();
 
-    // Dibujando el grafo
-
-//    GraphDrawer<adjacency_list_with_node_int_2D_and_vectorized, node_int_2D> graphDrawer(al);
-//
-//    graphDrawer.initialize(argc, argv);
-
     adj_mat = al.get_matrix();
 
+    // Dibujar grafo
     initialize(argc, argv);
 
     return 0;
@@ -79,9 +75,9 @@ GLvoid window_display() {
     for (unsigned i = 0; i < al.size; ++i) {
         glPushMatrix();
             glTranslatef(adj_mat[i][0].coordinate.x, adj_mat[i][0].coordinate.y, 0);
-            glColor3f(0.8f, 0.5f, 0.2f);
-            // TODO: radius needs to depend on the amount of nodes
-            glutWireSphere(5, 50, 10);
+            glColor3f(SPHERE_RED, SPHERE_GREEN, SPHERE_BLUE);
+            // FIXME: radius needs to depend on the amount of nodes
+            glutWireSphere(NODE_RADIUS, SPHERE_SLICES, SPHERE_STACKS);
         glPopMatrix();
     }
 
@@ -120,7 +116,6 @@ GLvoid initialize(int argc, char** argv) {
     glutDisplayFunc(window_display);
     glutReshapeFunc(window_reshape);
     glutKeyboardFunc(key_pressed);
-//    glutTimerFunc(DURATION, Timer, 1);
     glutMouseFunc(mouse_click);
     glutMainLoop();
 }

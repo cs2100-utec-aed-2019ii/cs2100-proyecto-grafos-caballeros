@@ -1,9 +1,11 @@
 #ifndef ADJACENTLIST_ADJACENCYLIST_H
 #define ADJACENTLIST_ADJACENCYLIST_H
 
-#include <vector>
 #include <iterator>
 #include <list>
+#include <GLUT/glut.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 
 #include "Node.h"
 
@@ -27,8 +29,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
     /// CONSTRUCTURES POR DEFECTO
     AdjacencyList() = default;
     ~AdjacencyList() = default;
-
-
+    
 //--------------------------------------------------------------------------INSERT NODE
 
     void insert_node_by_address(Node* node) {

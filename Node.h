@@ -52,7 +52,7 @@ struct Node<T, Coordinate2D> {
         return value;
     }
 
-    T get_value(){ return value;}
+    T get_value() { return value; }
 
     bool operator<(const Node<T, Coordinate2D> &rhs) const {
         return value < rhs.value;
