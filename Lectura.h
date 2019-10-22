@@ -9,7 +9,6 @@
 #include "Node.h"
 #include "AdjacencyList.h"
 
-#define node_int_2D Node<int, Coordinate2D>
 
 template <class node_type, class coordinate_type>
 struct Lectura {};
@@ -35,10 +34,11 @@ struct Lectura<node_type, Coordinate2D> {
         string path = prev ? "nodos_antiguos.vtk" : "nodos.vtk";
         ifstream myfile (path);
         vector < Node<int, Coordinate2D>* > nodos;
-        int cantidad_de_nodos = 0;
+        long cantidad_de_nodos = 0;
         string cantidad;
         string line;
         char separador = ' ';
+        AdjacencyList<node_type, vectorized> list;
 
         ///Lectura del .vtk
         if ( myfile.is_open() ) {
@@ -53,7 +53,7 @@ struct Lectura<node_type, Coordinate2D> {
             for (size_t p = 0, q = 0, i = 0; i < 2; p = q, i++)
                 cantidad = sline.substr(p + (p != 0), (q = sline.find(separador, p + 1)) - p - (p != 0));
 
-            cantidad_de_nodos = stoi(cantidad);
+            cantidad_de_nodos = stol(cantidad);
 
             cout << "Cantidad de nodos: " << cantidad_de_nodos << endl;
 
@@ -71,7 +71,7 @@ struct Lectura<node_type, Coordinate2D> {
                     valor_ = stod(valor);
                     coordinates.push_back(valor_);
                 }
-                auto node = new Node<int, Coordinate2D>(coordinates[0], coordinates[1]);
+                auto node = new Node<int, Coordinate2D>(coordinates[0], coordinates[1], cantidad_de_nodos*3);
                 nodos.push_back(node);
             }
 
@@ -79,11 +79,14 @@ struct Lectura<node_type, Coordinate2D> {
 
         vtk_nodes = nodos;
 
-        //for (auto & nodo : nodos) { nodo->print_coordinates(); }
+        for (auto & nodo : nodos) {
 
-        AdjacencyList<node_type, vectorized> list;
+            while (list.search_node_by_value_returns_position(nodo->value) != -1){
+                nodo->new_value();
+            }
 
-        for (auto & nodo : nodos) { list.insert_node_by_address(nodo); }
+            list.insert_node_by_address(nodo);
+        }
 
         ///Eliminar linea blanca
         getline(myfile, line);
@@ -95,7 +98,6 @@ struct Lectura<node_type, Coordinate2D> {
         cline = line;
         for (size_t p = 0, q = 0, i = 0; i < 2; p = q, i++) {
             cantidad = cline.substr(p + (p != 0), (q = cline.find(separador, p + 1)) - p - (p != 0));
-            //cout << "p: " << p << ", q: " << q << endl;
         }
         conexiones_totales = stoi(cantidad);
         cout << "Conexiones totales: " << conexiones_totales << endl;
@@ -118,8 +120,6 @@ struct Lectura<node_type, Coordinate2D> {
                 nodo = line.substr(p + (p != 0), (q = line.find(separador, p + 1)) - p - (p != 0));
                 indices.push_back(stoi(nodo));
             }
-
-            //for (auto & indice : indices) { cout << indice << " "; } cout << endl;
 
             for (int i = 0; i < indices.size(); ++i) {
                 if (i == indices.size()-1 ){
