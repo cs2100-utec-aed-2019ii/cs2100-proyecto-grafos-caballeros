@@ -19,7 +19,7 @@ struct Lectura<node_type, Coordinate2D> {
 
     vector < node_type* > vtk_nodes;
 
-    AdjacencyList<node_int_2D, vectorized> cargar_datos (const string& vtk_file) {
+    AdjacencyList<node_type, vectorized> cargar_datos (const string& vtk_file) {
         ///Revisar si existe un archivo previo
         ifstream check("nodos_antiguos.vtk");
         bool prev;
