@@ -81,7 +81,7 @@ struct Lectura<node_type, Coordinate2D> {
 
         //for (auto & nodo : nodos) { nodo->print_coordinates(); }
 
-        AdjacencyList<node_int_2D, vectorized> list;
+        AdjacencyList<node_type, vectorized> list;
 
         for (auto & nodo : nodos) { list.insert_node_by_address(nodo); }
 
