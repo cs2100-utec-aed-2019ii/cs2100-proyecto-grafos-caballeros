@@ -13,16 +13,12 @@ int main(int argc, char * argv[]) {
     srand(time(nullptr));
 
     Lectura< Node<int, Coordinate2D>, Coordinate2D > l1;
-    auto nodos = l1.cargar_datos("nodos.vtk");
 
-    ///Print coordinates
-    for (auto & nodo : nodos) { nodo->print_coordinates(); }
+    ///Adjacency list
+    auto list = l1.cargar_datos("nodos.vtk");
 
-    AdjacencyList<node_int_2D, vectorized> list;
-
-    for (auto & nodo : nodos) { list.insert_node_by_address(nodo); }
-
-    list.print_adjacency_list();
+    l1.print();
+    //list.print_adjacency_list();
 
 
     return 0;
