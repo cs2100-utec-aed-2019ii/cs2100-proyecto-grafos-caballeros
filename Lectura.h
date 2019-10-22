@@ -6,9 +6,11 @@
 #define GRAPHOS_LECTURA_H
 
 #include <fstream>
-#include "Node.h"
-#include "AdjacencyList.h"
+#include <GLUT/glut.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 
+#include "AdjacencyList.h"
 
 template <class node_type, class coordinate_type>
 struct Lectura {};
@@ -18,7 +20,7 @@ struct Lectura<node_type, Coordinate2D> {
 
     vector < node_type* > vtk_nodes;
 
-    AdjacencyList<node_type, vectorized> cargar_datos (const string& vtk_file) {
+    AdjacencyList<node_type, vectorized>* cargar_datos(const string& vtk_file) {
         ///Revisar si existe un archivo previo
         ifstream check("nodos_antiguos.vtk");
         bool prev;
@@ -38,7 +40,7 @@ struct Lectura<node_type, Coordinate2D> {
         string cantidad;
         string line;
         char separador = ' ';
-        AdjacencyList<node_type, vectorized> list;
+        AdjacencyList<node_type, vectorized>* list = new AdjacencyList<node_type, vectorized>();
 
         ///Lectura del .vtk
         if ( myfile.is_open() ) {
@@ -81,11 +83,11 @@ struct Lectura<node_type, Coordinate2D> {
 
         for (auto & nodo : nodos) {
 
-            while (list.search_node_by_value_returns_position(nodo->value) != -1){
+            while (list->search_node_by_value_returns_position(nodo->value) != -1){
                 nodo->new_value();
             }
 
-            list.insert_node_by_address(nodo);
+            list->insert_node_by_address(nodo);
         }
 
         ///Eliminar linea blanca
@@ -123,13 +125,13 @@ struct Lectura<node_type, Coordinate2D> {
 
             for (int i = 0; i < indices.size(); ++i) {
                 if (i == indices.size()-1 ){
-                    auto nodo_1 = list.search_node_by_value_returns_address(vtk_nodes[indices[i]]->value);
-                    auto nodo_2 = list.search_node_by_value_returns_address(vtk_nodes[indices[0]]->value);
-                    list.link_node_by_address(nodo_1, nodo_2);
+                    auto nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[i]]->value);
+                    auto nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[0]]->value);
+                    list->link_node_by_address(nodo_1, nodo_2);
                 } else {
-                    auto nodo_1 = list.search_node_by_value_returns_address(vtk_nodes[indices[i]]->value);
-                    auto nodo_2 = list.search_node_by_value_returns_address(vtk_nodes[indices[i+1]]->value);
-                    list.link_node_by_address(nodo_1, nodo_2);
+                    auto nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[i]]->value);
+                    auto nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[i+1]]->value);
+                    list->link_node_by_address(nodo_1, nodo_2);
                 }
             }
         }

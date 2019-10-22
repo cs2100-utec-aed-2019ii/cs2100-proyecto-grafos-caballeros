@@ -25,9 +25,12 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
     vector < vector<Node> > * adjacency_list = new vector < vector<Node> >;
 
     /// CONSTRUCTURES POR DEFECTO
-    AdjacencyList() {
+    AdjacencyList() = default;
+
+    ~AdjacencyList() {
+        // TODO: delete all nodes in adjacency
+        cout << "Deleted adjacency list!" << endl;
     }
-    ~AdjacencyList() = default;
 
 
 //--------------------------------------------------------------------------INSERT NODE
