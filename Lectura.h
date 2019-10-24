@@ -37,7 +37,7 @@ struct Lectura<node_type, Coordinate2D> {
         if (!prev) {
             string path = "nodos.vtk";
             ifstream myfile(path);
-            vector<Node<int, Coordinate2D> *> nodos;
+            vector< Node<int, Coordinate2D>* > nodos;
             long cantidad_de_nodos = 0;
             string cantidad;
             string line;
@@ -62,28 +62,26 @@ struct Lectura<node_type, Coordinate2D> {
                 cout << "Cantidad de nodos: " << cantidad_de_nodos << endl;
 
                 ///Crear los nodos y guardarlos en un vector
-                for (int i = 0; i < cantidad_de_nodos; ++i) {
+                for (long i = 0; i < cantidad_de_nodos; ++i) {
                     getline(myfile, line);
-
                     int cantidad_de_coordenadas = 2;
                     string valor;
                     double valor_;
                     vector<double> coordinates;
 
-                    for (size_t p = 0, q = 0, i = 0; i < cantidad_de_coordenadas; p = q, i++) {
+                    for (size_t p = 0, q = 0, j = 0; j < cantidad_de_coordenadas; p = q, j++) {
                         valor = line.substr(p + (p != 0), (q = line.find(separador, p + 1)) - p - (p != 0));
                         valor_ = stod(valor);
                         coordinates.push_back(valor_);
                     }
-                    auto node = new Node<int, Coordinate2D>(coordinates[0], coordinates[1], cantidad_de_nodos * 3, i);
+                    auto* node = new Node<int, Coordinate2D>(coordinates[0], coordinates[1], cantidad_de_nodos * 3, i);
                     nodos.push_back(node);
                 }
             }
-
             vtk_nodes = nodos;
 
-            for (auto &nodo : nodos) {
-                while (list->search_node_by_value_returns_position(nodo->value) != -1) {
+            for (auto & nodo : nodos) {
+                while (list->search_node_by_value_returns_position(nodo->get_value()) != -1) {
                     nodo->new_value();
                 }
                 list->insert_node_by_address(nodo);
@@ -124,12 +122,12 @@ struct Lectura<node_type, Coordinate2D> {
 
                 for (int j = 0; j < indices.size(); ++j) {
                     if (j == indices.size() - 1) {
-                        auto nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[j]]->value);
-                        auto nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[0]]->value);
+                        auto* nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[j]]->value);
+                        auto* nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[0]]->value);
                         list->link_node_by_address(nodo_1, nodo_2);
                     } else {
-                        auto nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[j]]->value);
-                        auto nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[j + 1]]->value);
+                        auto* nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[j]]->value);
+                        auto* nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[j + 1]]->value);
                         list->link_node_by_address(nodo_1, nodo_2);
                     }
                 }
@@ -139,7 +137,7 @@ struct Lectura<node_type, Coordinate2D> {
         } else {
             string path = "nodos_antiguos.vtk";
             ifstream myfile(path);
-            vector<Node<int, Coordinate2D> *> nodos;
+            vector< Node<int, Coordinate2D> *> nodos;
             long cantidad_de_nodos = 0;
             string cantidad;
             string line;
