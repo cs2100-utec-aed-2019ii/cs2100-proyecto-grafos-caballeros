@@ -24,18 +24,17 @@ int main(int argc, char** argv) {
 
     srand(time(nullptr));
 
-
     ///Adjacency list
     al = l1->cargar_datos("nodos.vtk");
     l1->print();
-    //al->print_adjacency_list();
+    al->print_adjacency_list();
     adj_mat = al->get_matrix();
 
     // Dibujar grafo
     draw_graph(argc, argv);
 
     // Mostrar menú para insertar y/o borrar nodos
-    //show_menu();
+    show_menu();
 
     return 0;
 }

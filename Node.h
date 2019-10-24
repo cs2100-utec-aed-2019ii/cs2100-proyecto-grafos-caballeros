@@ -103,6 +103,11 @@ struct Node<T, Coordinate2D> {
     bool operator!=(const Node &rhs) const {
         return !(rhs == *this);
     }
+
+    ~Node() {
+        cout << "he muerto" << endl;
+    }
+
 };
 
 template <typename T>

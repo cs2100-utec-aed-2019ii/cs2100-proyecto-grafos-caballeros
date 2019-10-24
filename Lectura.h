@@ -221,12 +221,6 @@ struct Lectura<node_type, Coordinate2D> {
                     valores.push_back(stoi(nodo));
                 }
 
-                for (int z = 0; z < valores.size(); ++z){
-                    cout << valores[z] << " ";
-                }
-
-                cout << endl;
-
                 for (int i = 1; i < valores.size(); ++i) {
                     auto nodo_1 = list->search_node_by_value_returns_address(valores[0]);
                     auto nodo_2 = list->search_node_by_value_returns_address(valores[i]);
