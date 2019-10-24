@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
     lector = new Lectura<node_int_2D, Coordinate2D>();
 
-    al = new AdjacencyList<node_int_2D, vectorized>();
+    //al = new AdjacencyList<node_int_2D, vectorized>();
 /*
     auto* n1 = new node_int_2D(100);
     auto* n2 = new node_int_2D(200);
