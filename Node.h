@@ -105,7 +105,7 @@ struct Node<T, Coordinate2D> {
     }
 
     ~Node() {
-        cout << "he muerto" << endl;
+        //cout << "he muerto" << endl;
     }
 
 };
