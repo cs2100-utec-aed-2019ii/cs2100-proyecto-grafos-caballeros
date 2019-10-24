@@ -5,8 +5,11 @@
 #ifndef GRAPHOS_MACROS_H
 #define GRAPHOS_MACROS_H
 
-#define WINDOW_WIDTH 500
-#define WINDOW_HEIGHT 500
+//#define WINDOW_WIDTH 500
+//#define WINDOW_HEIGHT 500
+
+short WINDOW_WIDTH = 500;
+short WINDOW_HEIGHT = 500;
 
 #define WINDOW_X_POS 500
 #define WINDOW_Y_POS 300

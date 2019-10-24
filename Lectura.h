@@ -37,7 +37,7 @@ struct Lectura<node_type, Coordinate2D> {
         if (!prev) {
             string path = "nodos.vtk";
             ifstream myfile(path);
-            vector< Node<int, Coordinate2D>* > nodos;
+            vector< node_type* > nodos;
             long cantidad_de_nodos = 0;
             string cantidad;
             string line;
@@ -74,7 +74,7 @@ struct Lectura<node_type, Coordinate2D> {
                         valor_ = stod(valor);
                         coordinates.push_back(valor_);
                     }
-                    auto* node = new Node<int, Coordinate2D>(coordinates[0], coordinates[1], cantidad_de_nodos * 3, i);
+                    auto* node = new node_type(coordinates[0], coordinates[1], cantidad_de_nodos * 3, i);
                     nodos.push_back(node);
                 }
             }
@@ -137,7 +137,7 @@ struct Lectura<node_type, Coordinate2D> {
         } else {
             string path = "nodos_antiguos.vtk";
             ifstream myfile(path);
-            vector< Node<int, Coordinate2D> *> nodos;
+            vector< node_type* > nodos;
             long cantidad_de_nodos = 0;
             string cantidad;
             string line;
@@ -175,7 +175,7 @@ struct Lectura<node_type, Coordinate2D> {
                         coordinates.push_back(valor_);
                     }
                     //cout << "||" <<coordinates[3] << " " << coordinates[0] << " " << coordinates[1] << "||" <<endl;
-                    auto node = new Node<int, Coordinate2D>(coordinates[3], coordinates[0], coordinates[1]);
+                    auto node = new node_type(coordinates[3], coordinates[0], coordinates[1]);
                     nodos.push_back(node);
                 }
             }

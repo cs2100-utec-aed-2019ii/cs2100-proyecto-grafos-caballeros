@@ -624,7 +624,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
     void delete_node_by_value(typename node_type::n_type node) {
 
-        if(node == adjacency_list_matrix[0][0].value){
+        if(node == adjacency_list_matrix[0][0].value) {
             adjacency_list_matrix.erase(adjacency_list_matrix.begin());
             --size;
         }

@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
     lector = new Lectura<node_int_2D, Coordinate2D>();
 
-    //al = new AdjacencyList<node_int_2D, vectorized>();
+//    al = new AdjacencyList<node_int_2D, vectorized>();
 /*
     auto* n1 = new node_int_2D(100);
     auto* n2 = new node_int_2D(200);
@@ -46,7 +46,6 @@ int main(int argc, char** argv) {
     // Adjacency list
     al = lector->cargar_datos("nodos.vtk");
     al->print_adjacency_list();
-    //al->print_adjacency_list();
 
     adj_mat = *(al->adjacency_list);
 
@@ -156,7 +155,7 @@ GLvoid mouse_click(int button, int state, int x, int y) {
             node_int_2D _node = adj_mat[i][0];
             if (_node.coordinate.x == (float)x && _node.coordinate.y == WINDOW_HEIGHT-y) {
                 cout << "NODE ABOUT TO BE DELETED: " << _node.get_value() << endl;
-                al->delete_node_by_value(_node.value);
+                al->delete_node_by_value(_node.get_value());
                 cout << "NODE DELETEEEEEEEDDDD" << endl;
                 s = al->size;
                 adj_mat = *(al->adjacency_list);
@@ -201,6 +200,8 @@ GLvoid window_reshape(GLsizei width, GLsizei height) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0.0f, width, 0.0f, height, 0.0f, Z_DIST);
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
     glMatrixMode(GL_MODELVIEW);
 }
 
