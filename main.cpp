@@ -18,23 +18,24 @@ void show_menu();
 
 AdjacencyList<node_int_2D, vectorized>* al;
 vector<vector<node_int_2D>> adj_mat;
+Lectura<node_int_2D, Coordinate2D>* l1 = new Lectura<node_int_2D, Coordinate2D>() ;
 
 int main(int argc, char** argv) {
 
     srand(time(nullptr));
 
-    Lectura<node_int_2D, Coordinate2D> l1;
 
     ///Adjacency list
-    al = l1.cargar_datos("nodos.vtk");
-    al->print_adjacency_list();
+    al = l1->cargar_datos("nodos.vtk");
+    l1->print();
+    //al->print_adjacency_list();
     adj_mat = al->get_matrix();
 
     // Dibujar grafo
     draw_graph(argc, argv);
 
     // Mostrar menú para insertar y/o borrar nodos
-    show_menu();
+    //show_menu();
 
     return 0;
 }
@@ -52,6 +53,17 @@ GLvoid initGL() {
 GLvoid key_pressed(unsigned char key, int x, int y) {
     switch (key) { // qué tecla se ha presionado
         case 'q':
+            char respuesta;
+            cout << "¿Quieres guardar? y/n" << endl;
+            cin >> respuesta;
+
+            if (respuesta == 'y') {
+                al->delete_node_by_value(4);
+                l1->save_adjacency_list(al);
+                cout << "Guardando adjacency list como nodos_antiguos.vtk." << endl;
+            }
+
+            delete l1;
             delete al;
             exit(1);
         default:
