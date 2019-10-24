@@ -21,19 +21,27 @@ struct Node {};
 template <typename T>
 struct Node<T, Coordinate2D> {
     T value;
-    long max_value;
+    int max_value =  1000;
+    long id;
     typedef T n_type;
     typedef Coordinate2D coordinate_type;
     coordinate_type coordinate;
 
     Node() = default;
 
-    void print_coordinates () {
-        cout << "x: " << coordinate.x << ", y: " << coordinate.y << ", value: " << value << endl;
+    void print_all () {
+        cout << "x: " << coordinate.x << ", y: " << coordinate.y << ", z: " << 0 << ", value: " << value << endl;
     }
 
-    void new_value () {
+    void new_value() {
         value = (rand()%max_value)+1;
+    }
+
+    Node(float x, float y, long max_value_, long id_) {
+        id = id_;
+        max_value = max_value_;
+        value = (rand()%max_value)+1;
+        coordinate = Coordinate2D(x, y);
     }
 
     Node(float x, float y, long max_value_) {
@@ -44,6 +52,7 @@ struct Node<T, Coordinate2D> {
 
     Node(float x, float y) {
         value = (rand()%max_value)+1;
+        cout << "VALUAO: " << value << endl;
         coordinate = Coordinate2D(x, y);
     }
 
@@ -57,6 +66,10 @@ struct Node<T, Coordinate2D> {
         coordinate = Coordinate2D(x, y);
     }
 
+    void print_id() {
+        cout << id << " ";
+    }
+
     void print_value() {
         cout << value << " ";
     }
@@ -65,22 +78,22 @@ struct Node<T, Coordinate2D> {
         return value;
     }
 
-    T get_value(){ return value;}
+    T get_value() { return value; }
 
-    bool operator<(const Node<T, Coordinate2D> &rhs) const {
+    bool operator<(const Node<T, Coordinate2D>& rhs) const {
         return value < rhs.value;
     }
 
     bool operator>(const Node<T, Coordinate2D> &rhs) const {
-        return rhs < *this;
+        return value > rhs.value;
     }
 
     bool operator<=(const Node<T, Coordinate2D> &rhs) const {
-        return !(rhs < *this);
+        return value <= rhs.value;
     }
 
     bool operator>=(const Node<T, Coordinate2D> &rhs) const {
-        return !(*this < rhs);
+        return value >= rhs.value;
     }
 
     friend ostream &operator<<(ostream &os, const Node& self) {
@@ -93,8 +106,13 @@ struct Node<T, Coordinate2D> {
     }
 
     bool operator!=(const Node &rhs) const {
-        return !(rhs == *this);
+        return !(*this == rhs);
     }
+
+    ~Node() {
+        cout << "HE MUERTO TENGO VALOR: " << value << endl;
+    }
+
 };
 
 template <typename T>

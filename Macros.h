@@ -19,6 +19,8 @@
 #define SPHERE_GREEN 1.0f
 #define SPHERE_BLUE 1.0f
 
+#define Z_DIST 100
+
 #define RED 0
 #define GREEN 0
 #define BLUE 0

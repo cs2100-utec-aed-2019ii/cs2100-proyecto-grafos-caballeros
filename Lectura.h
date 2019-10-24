@@ -21,12 +21,13 @@ struct Lectura<node_type, Coordinate2D> {
     vector < node_type* > vtk_nodes;
 
     AdjacencyList<node_type, vectorized>* cargar_datos(const string& vtk_file) {
+
         ///Revisar si existe un archivo previo
         ifstream check("nodos_antiguos.vtk");
         bool prev;
         if ( check.fail() ){
             cout << "No existe previo archivo." << endl;
-            system("cp nodos.vtk nodos_antiguos.vtk");
+            //system("cp nodos.vtk nodos_antiguos.vtk");
             prev = false;
         } else {
             cout << "Existe previo archivo." << endl;
@@ -40,7 +41,7 @@ struct Lectura<node_type, Coordinate2D> {
         string cantidad;
         string line;
         char separador = ' ';
-        AdjacencyList<node_type, vectorized>* list = new AdjacencyList<node_type, vectorized>();
+        auto* list = new AdjacencyList<node_type, vectorized>();
 
         ///Lectura del .vtk
         if ( myfile.is_open() ) {
@@ -73,7 +74,7 @@ struct Lectura<node_type, Coordinate2D> {
                     valor_ = stod(valor);
                     coordinates.push_back(valor_);
                 }
-                auto node = new Node<int, Coordinate2D>(coordinates[0], coordinates[1], cantidad_de_nodos*3);
+                auto node = new Node<int, Coordinate2D>(coordinates[0], coordinates[1], cantidad_de_nodos*3, i);
                 nodos.push_back(node);
             }
 
@@ -82,11 +83,9 @@ struct Lectura<node_type, Coordinate2D> {
         vtk_nodes = nodos;
 
         for (auto & nodo : nodos) {
-
             while (list->search_node_by_value_returns_position(nodo->value) != -1){
                 nodo->new_value();
             }
-
             list->insert_node_by_address(nodo);
         }
 
@@ -124,15 +123,9 @@ struct Lectura<node_type, Coordinate2D> {
             }
 
             for (int i = 0; i < indices.size(); ++i) {
-                if (i == indices.size()-1 ){
-                    auto nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[i]]->value);
-                    auto nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[0]]->value);
-                    list->link_node_by_address(nodo_1, nodo_2);
-                } else {
-                    auto nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[i]]->value);
-                    auto nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[i+1]]->value);
-                    list->link_node_by_address(nodo_1, nodo_2);
-                }
+                auto nodo_1 = list->search_node_by_value_returns_address(vtk_nodes[indices[0]]->value);
+                auto nodo_2 = list->search_node_by_value_returns_address(vtk_nodes[indices[i]]->value);
+                list->link_node_by_address(nodo_1, nodo_2);
             }
         }
 
@@ -141,9 +134,38 @@ struct Lectura<node_type, Coordinate2D> {
     }
 
     void print() {
-        for (auto & node : vtk_nodes) { node->print_coordinates(); }
+        for (auto & node : vtk_nodes) { node->print_all(); }
     }
 
+    void save_adjacency_list (AdjacencyList<node_type, vectorized>* al) {
+        ofstream myfile("nodos_antiguos.vtk");
+        ///Lineas por defecto
+        myfile << "# vtk DataFile Version 2.0\n2D scalar data\nASCII\nDATASET UNSTRUCTURED_GRID\n\n";
+        myfile << "POINTS " << al->size << " float" << endl;
+
+        auto adj_mat = al->get_matrix();
+
+        ///Ordenar por id
+
+
+        ///Nodos
+        for (unsigned i = 0; i < al->size; ++i) {
+            myfile << adj_mat[i][0].coordinate.x << " " << adj_mat[i][0].coordinate.y << " 0";
+            myfile << endl;
+        }
+
+        ///Conexiones de nodos
+
+        myfile << "\nCELLS " << al->size << endl;
+        for (unsigned i = 0; i < al->size; ++i) {
+            myfile << adj_mat[i].size() << " ";
+            for (unsigned j = 0; j < adj_mat[i].size(); ++j) {
+                myfile << adj_mat[i][j].id << " ";
+            }
+            myfile << endl;
+        }
+        myfile<<endl;
+    }
 };
 
 template <class node_type>
@@ -154,7 +176,7 @@ struct Lectura<node_type, Coordinate3D> {
         bool prev;
         if ( check.fail() ){
             cout << "No existe previo archivo." << endl;
-            system("cp nodos.vtk nodos_antiguos.vtk");
+            //system("cp nodos.vtk nodos_antiguos.vtk");
             prev = false;
         } else {
             cout << "Existe previo archivo." << endl;
