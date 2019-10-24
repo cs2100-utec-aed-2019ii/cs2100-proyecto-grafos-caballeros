@@ -45,12 +45,6 @@ struct Node<T, Coordinate2D> {
         coordinate = Coordinate2D(x, y);
     }
 
-    Node(float x, float y, long max_value_) {
-        max_value = max_value_;
-        value = (rand()%max_value)+1;
-        coordinate = Coordinate2D(x, y);
-    }
-
     Node(float x, float y) {
         value = (rand()%max_value)+1;
         coordinate = Coordinate2D(x, y);
@@ -62,7 +56,8 @@ struct Node<T, Coordinate2D> {
         coordinate = Coordinate2D((rand()%WINDOW_WIDTH)+1, (rand()%WINDOW_HEIGHT)+1);
     }
 
-    Node(T value, float x, float y): value{value} {
+    Node(T value, float x, float y) {
+        this->value = value;
         coordinate = Coordinate2D(x, y);
     }
 
