@@ -458,6 +458,10 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
     }
 
     int search_node_by_value_returns_position(typename node_type::n_type value){
+        if (size == 0){
+            return -1;
+        }
+
         if(adjacency_list_matrix[0][0].get_value() == value){
             return 0;
         }
@@ -620,7 +624,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
     void delete_node_by_value(typename node_type::n_type node) {
 
-        if(node == adjacency_list_matrix[0][0].value){
+        if(node == adjacency_list_matrix[0][0].value) {
             adjacency_list_matrix.erase(adjacency_list_matrix.begin());
             --size;
         }

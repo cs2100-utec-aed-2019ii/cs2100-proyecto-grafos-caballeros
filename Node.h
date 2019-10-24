@@ -44,11 +44,11 @@ struct Node<T, Coordinate2D> {
         coordinate = Coordinate2D(x, y);
     }
 
-    Node(float x, float y, long max_value_) {
+    /*Node(float x, float y, long max_value_) {
         max_value = max_value_;
         value = (rand()%max_value)+1;
         coordinate = Coordinate2D(x, y);
-    }
+    }*/
 
     Node(float x, float y) {
         value = (rand()%max_value)+1;
