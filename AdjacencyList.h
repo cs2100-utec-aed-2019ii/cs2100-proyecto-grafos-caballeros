@@ -1,45 +1,47 @@
 #ifndef ADJACENTLIST_ADJACENCYLIST_H
 #define ADJACENTLIST_ADJACENCYLIST_H
 
-#include <vector>
 #include <iterator>
 #include <list>
-
+#include <utility>
 #include "Node.h"
 
 #define adjacency_list_matrix (*adjacency_list)
-#define vectorized 1
-#define linked_list 2
+
+#define vectorized true
+#define linked_list false
 
 using namespace std;
 
-template <typename node_type, short container>
+template <typename node_type, bool container>
 struct AdjacencyList {};
 
 template <typename node_type>
 struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
     typedef node_type Node;
+
     unsigned int size = 0;
 
-    vector < vector<Node> > * adjacency_list = new vector < vector<Node> >;
+    vector<vector<Node>>* adjacency_list = new vector<vector<Node>>;
+
 
     /// CONSTRUCTURES POR DEFECTO
     AdjacencyList() {
+        cout << "Adjacency List Created!" << endl;
     }
-    ~AdjacencyList() = default;
-
+    ~AdjacencyList() {
+        cout << "Adjacency List Deleted!" << endl;
+    }
 
 //--------------------------------------------------------------------------INSERT NODE
 
     void insert_node_by_address(Node* node) {
-
         if (size == 0) {
-            vector<Node> aux;
-            aux.push_back(*node);
-            adjacency_list_matrix.push_back(aux);
+            auto* aux = new vector<Node>();
+            aux->push_back(*node);
+            adjacency_list->push_back(*aux);
             ++size;
-
         } else {
             int pos = 0;
             int l = 0;
@@ -70,18 +72,18 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             }
             Exit:
             if (pos == -1) {
-                vector<Node> aux;
-                aux.push_back(*node);
-                adjacency_list_matrix.insert(adjacency_list_matrix.begin(), aux);
+                auto* aux = new vector<Node>();
+                aux->push_back(*node);
+                adjacency_list_matrix.insert(adjacency_list_matrix.begin(), *aux);
                 ++size;
 
             } else if (pos == -2) {
                 cout << "Node not inserted" << endl;
             } else {
-                vector<Node> aux;
-                aux.push_back(*node);
+                auto* aux = new vector<Node>();
+                aux->push_back(*node);
                 auto it = adjacency_list_matrix.begin() + (pos + 1);
-                adjacency_list_matrix.insert(it, aux);
+                adjacency_list_matrix.insert(it, *aux);
                 ++size;
             }
         }
@@ -155,6 +157,8 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
         if(p1 == -1 || p2 == -1){ return;}
 
+        ///TODO CHEQUEAR QUE NO LA HE CAGADO
+
         auto node_from = &adjacency_list_matrix[p1][0];
         auto node_to = &adjacency_list_matrix[p2][0];
 
@@ -211,6 +215,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             Exit:
             if(pos1 == -1){
                 adjacency_list_matrix[pos].insert(adjacency_list_matrix[pos].begin()+1,*node_to);
+
 
             }
             else if (pos1 == -2){
@@ -288,6 +293,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             if(pos1 == -1){
                 adjacency_list_matrix[pos].insert(adjacency_list_matrix[pos].begin()+1,*node_to);
 
+
             }
             else if (pos1 == -2){
                 cout << "Node not inserted" << endl;
@@ -295,6 +301,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             else{
                 auto it = adjacency_list_matrix[pos].begin() +  (pos1 +1);
                 adjacency_list_matrix[pos].insert(it, *node_to);
+
 
             }
         }
@@ -304,6 +311,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 
     void link_node_by_address(Node* node_from, Node* node_to) {
+
         int l = 0;
         int pos = 0;
         int r = size;
@@ -358,6 +366,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             if(pos1 == -1){
                 adjacency_list_matrix[pos].insert(adjacency_list_matrix[pos].begin()+1,*node_to);
 
+
             }
             else if (pos1 == -2){
                 cout << "Node not inserted" << endl;
@@ -366,10 +375,12 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
                 auto it = adjacency_list_matrix[pos].begin() +  (pos1 +1);
                 adjacency_list_matrix[pos].insert(it, *node_to);
 
+
             }
         }
 
         cout << "Node linked" << endl;
+
     }
 
 
@@ -418,14 +429,14 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
         }
 
 
-        if( adjacency_list_matrix[pos].size() == 1){
+        if ( adjacency_list_matrix[pos].size() == 1){
             cout << "Node passed has no linked nodes" << endl;
             vector<Node> nonode;
             return nonode;
         }
-        else{
+        else {
             vector<Node> rtrn;
-            for(int i =1; i < aux.size(); i++){
+            for(int i = 1; i < aux.size(); i++){
                 rtrn.push_back(adjacency_list_matrix[pos][i]);
             }
             return rtrn;
@@ -464,17 +475,19 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
     }
 
     int search_node_by_value_returns_position(typename node_type::n_type value){
+        if(size == 0){ return -1;}
         if(adjacency_list_matrix[0][0].get_value() == value){
             return 0;
         }
         else if (adjacency_list_matrix[size-1][0].get_value() == value){
+
             return size-1;
         }
-        else{
+        else {
             int l = 0;
             int r = size;
             auto x = value;
-            if(value <= *adjacency_list_matrix[size-1][0] && value >= *adjacency_list_matrix[0][0]) {
+            if (value <= *adjacency_list_matrix[size-1][0] && value >= *adjacency_list_matrix[0][0]) {
                 while (l <= r) {
                     int m = l + (r - l) / 2;
 
@@ -489,7 +502,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
                 }
                 return -1;
             }
-            else{
+            else {
                 return -1;
             }
         }
@@ -550,6 +563,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 
     void delete_connection_with_values(typename node_type::n_type node_from, typename node_type::n_type node_to){
+        if(size==0 || search_node_by_value_returns_position(node_from)==-1 || search_node_by_value_returns_position(node_to)==-1) {return;}
         int l = 0;
         int pos = 0;
         int r = size;
@@ -617,22 +631,19 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
     }
 
-
 //--------------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------------DELETE NODE
-
-
-void delete_node_by_value(typename node_type::n_type node) {
+    void delete_node_by_value(typename node_type::n_type node) {
 
         if(node == adjacency_list_matrix[0][0].value){
             adjacency_list_matrix.erase(adjacency_list_matrix.begin());
-            size--;
+            --size;
         }
         else if(node == adjacency_list_matrix[size-1][0].value){
             adjacency_list_matrix.erase(adjacency_list_matrix.end());
-            size--;
+            --size;
         }
         else{
             int pos = 0;
@@ -657,14 +668,18 @@ void delete_node_by_value(typename node_type::n_type node) {
                     }
                 }
                 Exit:
+                cout << "Test antes" << endl;
                 auto it = adjacency_list_matrix.begin() + pos;
                 adjacency_list_matrix.erase(it);
+                cout << "Test despues" << endl;
                 cout << "Node deleted" << endl;
                 --size;
+                cout << "DELETED NODE SUCCESSFULLY" << endl;
+
             }
         }
 
-        for(int i =0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             if(node == adjacency_list_matrix[i][1].value && adjacency_list_matrix[i].size() > 1){
                 auto aux = adjacency_list_matrix[i].begin() + 1;
                 adjacency_list_matrix[i].erase(aux);
@@ -698,11 +713,8 @@ void delete_node_by_value(typename node_type::n_type node) {
                     }
 
                     Exit1:
-                    if(pos == -1){
-                        cout<<"";
-                    }
+                    if (pos == -1) {}
                     else{
-
                         auto it = adjacency_list_matrix[i].begin() + pos;
                         adjacency_list_matrix[i].erase(it);
                     }
@@ -714,18 +726,70 @@ void delete_node_by_value(typename node_type::n_type node) {
     }
 
 
-void delete_node_by_address(Node* node) {
-       auto aux = node->get_value();
-       delete_node_by_value(aux);
+    void delete_node_by_address(Node* node) {
+        auto aux = node->get_value();
+        delete_node_by_value(aux);
     }
 
-
+    void delete_node_by_position(int pos) {
+        auto aux1 = search_node_by_position_returns_address(pos);
+        delete_node_by_address(aux1);
+    }
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------SMALL FUNCTIONS
 
     vector<vector<Node>> get_matrix() {
         return adjacency_list_matrix;
+    }
+
+    int node_grade_out_by_value(typename node_type::n_type value){
+        if(size == 0){return -1;}
+        else{
+            auto pos = search_node_by_value_returns_position(value);
+            if(pos == -1){return -1;}
+            else {
+                return adjacency_list_matrix[pos].size()-1;
+            }
+        }
+    }
+
+    int node_grade_in_by_value(typename node_type::n_type node){
+        if(size == 0 || search_node_by_value_returns_position(node) == -1){return -1;}
+        int cont = 0;
+        for (int i = 0; i < size; i++) {
+
+                int pos = -1;
+                int l = 0;
+                int r = adjacency_list_matrix[i].size();
+                if (node > adjacency_list_matrix[i][r - 1].value) {
+                    pos = r - 1;
+                } else if (node < adjacency_list_matrix[i][1].value) {
+                    pos = 0;
+                } else {
+                    while (l <= r) {
+                        int m = l + (r - l) / 2;
+                        if (adjacency_list_matrix[i][m].value == node) {
+                            pos = m;
+                            goto Exit1;
+                        }
+
+                        if (adjacency_list_matrix[i][m].value < node) {
+                            l = m + 1;
+                        }else{
+                            r = m - 1;
+                        }
+                    }
+
+                    Exit1:
+                    if (pos == -1) {return -1;}
+                    else{
+                        ++cont;
+                    }
+
+                }
+        }
+        return cont;
     }
 
 
@@ -736,7 +800,7 @@ void delete_node_by_address(Node* node) {
             }
             cout << endl;
         }
-        cout<<endl;
+        cout << endl;
     }
 
 //--------------------------------------------------------------------------

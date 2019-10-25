@@ -3,41 +3,58 @@
 //#include "GraphDrawer.h"
 
 #include "AdjacencyList.h"
+#include "Grafo.h"
 #define adjacency_list_with_node_int_2D_and_vectorized AdjacencyList<node_int_2D, vectorized>
 
 using namespace std;
 
 int main(int argc, char** argv) {
 
-    AdjacencyList<node_int_2D, vectorized> al;
+    AdjacencyList<node_int_2D, vectorized>* al = new AdjacencyList<node_int_2D, vectorized>;
 
-    auto a = node_int_2D(3, 10, 10);
-    auto b = node_int_2D(4, 10, 20);
-    auto c = node_int_2D(1, 20, 10);
-    auto d = node_int_2D(2, 2, 1);
-    auto f = node_int_2D(0,1,1);
-    auto e = node_int_2D(5, 2, 11);
-    al.insert_node_by_address(&d);
+    auto* n1 = new node_int_2D(100, 100, 100);
+    auto* n2 = new node_int_2D(200, 200, 200);
+    auto* n3 = new node_int_2D(300, 300, 300);
+    auto* n4 = new node_int_2D(400, 150, 150);
 
-    al.insert_node_by_address(&a);
+    al->insert_node_by_address(n1);
+    al->insert_node_by_address(n2);
+    al->insert_node_by_address(n3);
+    al->insert_node_by_address(n4);
 
-    al.insert_node_by_address(&e);
+    al->print_adjacency_list();
 
-    al.insert_node_by_address(&b);
+    al->link_node_by_address(n1, n2);
+    al->link_node_by_address(n2, n3);
+    al->link_node_by_address(n1, n4);
+    al->link_node_by_address(n4, n3);
 
-    al.insert_node_by_address(&c);
+    al->print_adjacency_list();
 
-    al.insert_node_by_address(&f);
+    Grafo<node_int_2D, dirigido> mygraph(al);
 
-    al.link_node_by_value(3,1);
+    mygraph.print_edges();
 
-    al.link_node_by_value(3,0);
+    auto x = new node_int_2D(150,156,150);
 
-    al.print_adjacency_list();
+    mygraph.insert_node(x);
 
-    al.delete_node_by_value(1);
+    mygraph.link_node_by_address(x,n1);
 
-    al.print_adjacency_list();
+    mygraph.print_graph();
+
+    mygraph.print_edges();
+
+    mygraph.delete_node(n4);
+
+    mygraph.print_edges();
+
+    mygraph.print_graph();
+
+    mygraph.delete_connection_with_addresses(x,n1);
+
+    mygraph.print_graph();
+    mygraph.print_edges();
 
     return 0;
 }
