@@ -8,7 +8,6 @@
 #include <iostream>
 #include <random>
 #include <ctime>
-#include <vector>
 
 #include "Macros.h"
 #include "Coordinates.h"

@@ -10,7 +10,7 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 
-#include "AdjacencyList.h"
+#include "Grafo.h"
 
 template <class node_type, class coordinate_type>
 struct Lectura {};

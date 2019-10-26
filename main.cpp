@@ -1,5 +1,6 @@
 #define _node_type int
 #define generic_node Node<_node_type, Coordinate2D>
+#define dirigido true
 #define GL_SILENCE_DEPRECATION
 
 #include "Lectura.h"
@@ -7,7 +8,7 @@
 #define adjacency_list_with_node_int_2D_and_vectorized AdjacencyList<generic_node, vectorized>
 
 using namespace std;
-
+// Prototyping OpenGL functions
 GLvoid initGL();
 GLvoid key_pressed(unsigned char key, int x, int y);
 GLvoid mouse_click(int button, int state, int x, int y);
@@ -16,21 +17,28 @@ GLvoid window_reshape(GLsizei width, GLsizei height);
 GLvoid draw_graph(int argc, char** argv);
 void show_menu();
 
-AdjacencyList<generic_node, vectorized>* al;
+AdjacencyList<generic_node, vectorized>* al; // adjacency list object
 Lectura<generic_node, Coordinate2D>* lector; // read and save (.vtk format)
-vector<vector<generic_node>> adj_mat;
+vector<vector<generic_node>> adj_mat; // adjacency list
+Grafo<generic_node, dirigido>* graph;
 
 bool draw_MST_Kruskal = false;
 bool draw_MST_Prim = false;
 bool draw_BFS_path = false;
 bool draw_DFS_path = false;
 bool insert_mode = false;
+bool degree_of_node_mode = false; bool degree_of_incidence = false; bool degree_of_outcidence = false;
+bool neighborhood_mode = false; bool permission_to_draw_neighborhood = false;
+bool validate_neighborhood = false;
 
 short nodes_selected_for_DFS = 0;
 short nodes_selected_for_BFS = 0;
 
 pair<generic_node, generic_node> nodes_for_BFS_or_DFS;
 vector<generic_node> nodes_to_link;
+vector<generic_node> possible_neighbors;
+
+short possible_neighbors_selected = 0;
 
 int main(int argc, char** argv) {
 
@@ -38,15 +46,19 @@ int main(int argc, char** argv) {
 
     lector = new Lectura<generic_node, Coordinate2D>();
 
-    // Adjacency list
+    /// Read adjacency list from .vtk
     al = lector->cargar_datos("nodos.vtk");
     al->print_adjacency_list();
 
+    /// Creando el grafo
+    graph = new Grafo<generic_node, dirigido>(al);
+
     adj_mat = *(al->adjacency_list);
 
-    // Dibujar grafo
+    /// Dibujar grafo
     draw_graph(argc, argv);
-    cout << "Termina el main" << endl;
+
+    cout << "Programa terminando..." << endl;
 
     delete al;
     delete lector;
@@ -76,8 +88,10 @@ GLvoid initGL() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 }
-// FIXME: solo inserta bien una vez? Chequear
+
 generic_node new_node = generic_node();
+generic_node selected_node_for_neighborhood = generic_node();
+vector<generic_node> nodes_linked_to_selected_node_for_neighborhood;
 
 GLvoid key_pressed(unsigned char key, int x, int y) {
     switch (key) {
@@ -85,7 +99,6 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
             if (!insert_mode) {
                 insert_mode = true;
                 cout << "Modo insertar habilitado.\n";
-
                 _node_type new_value;
                 do {
                     cout << "Valor del nodo: ";
@@ -109,36 +122,68 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
             break;
         }
         case '2': {
-            for (auto& n : nodes_to_link) {
-                al->link_node_by_address(&new_node, &n);
+            if (insert_mode) {
+                for (auto& n : nodes_to_link) {
+                    al->link_node_by_address(&new_node, &n);
+                }
+                adj_mat = *(al->adjacency_list); // update reference to adjacency list
+                al->print_adjacency_list();
+                nodes_to_link.clear(); // reset auxiliar vector
+                insert_mode = false; // turn off insert mode
+                cout << "Modo insertar deshabilitado.\n";
+                glutPostRedisplay(); // re-draw window
+                break;
             }
-            adj_mat = *(al->adjacency_list);
-            al->print_adjacency_list();
-            nodes_to_link.clear();
-            insert_mode = false;
-            cout << "Modo insertar deshabilitado.\n";
-            glutPostRedisplay();
             break;
         }
         case '3': {
-            cout << "Opción 3.\n";
+            if (!degree_of_node_mode) {
+                degree_of_node_mode = true;
+                cout << "Modo grado de un nodo activado. Presione 3 para desactivar.\n";
+
+                if (dirigido) {
+                    short degree_type;
+                    do {
+                        cout << "¿Grado de incidencia o outcidencia? [1/2] : ";
+                        cin >> degree_type;
+                    } while (degree_type != 1 && degree_type != 2);
+
+                    if (degree_type == 1) {
+                        degree_of_incidence = true;
+                    } else {
+                        degree_of_outcidence = true;
+                    }
+                }
+
+                cout << "Seleccione un nodo para descubrir su grado.\n";
+                al->print_adjacency_list();
+            } else {
+                degree_of_node_mode = false;
+                degree_of_incidence = false;
+                degree_of_outcidence = false;
+                cout << "Modo grado de un nodo desactivado.\n";
+            }
             break;
         }
         case '4': {
-            cout << "Opción 4.\n";
+            // TODO: conexo
             break;
         }
         case '5': {
-            cout << "Opción 5.\n";
+            // TODO: bipartito
             break;
         }
         case '6': {
-            cout << "Opción 6.\n";
+            if (graph->calculate_density() >= 0.9f) {
+                cout << "El grafo es denso!\n";
+            } else {
+                cout << "El grafo no es denso!\n";
+            }
             break;
         }
         case '7': { // MST Kruskal: pintar el minimum spanning tree de rojo
             if (!draw_MST_Kruskal) {
-                cout << "Modo MST Kruskal habilitado.\n";
+                cout << "Modo MST Kruskal habilitado. Presione 7 para desactivar.\n";
                 draw_MST_Kruskal = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
@@ -152,7 +197,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case '8': { // MST Prim: pintar el minimum spanning tree de rojo
             if (!draw_MST_Prim) {
-                cout << "Modo MST Prim habilitado.\n";
+                cout << "Modo MST Prim habilitado. Presione 8 para desactivar.\n";
                 draw_MST_Prim = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
@@ -166,7 +211,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case '9': { // BFS: mostrar la secuencia de nodos
             if (!draw_BFS_path) {
-                cout << "Modo BFS habilitado.\n";
+                cout << "Modo BFS habilitado. Presione 9 para desactivar.\n";
                 draw_BFS_path = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
@@ -181,7 +226,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case 'a': { // DFS: mostrar la secuencia de nodos
             if (!draw_DFS_path) {
-                cout << "Modo DFS habilitado.\n";
+                cout << "Modo DFS habilitado. Presione 'a' para desactivar.\n";
                 draw_DFS_path = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
@@ -195,11 +240,29 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
             break;
         }
         case 'b': {
-            cout << "Opción b.\n";
+            if (!neighborhood_mode) {
+                neighborhood_mode = true;
+                cout << "Modo vecindad de un nodo habilitado. Presione 'b' para deshabilitarlo.\n";
+                cout << "Seleccione un nodo para descubrir su vecindario.\n";
+            } else {
+                cout << "Modo vecindad deshabilitado.\n";
+                permission_to_draw_neighborhood = false;
+                neighborhood_mode = false;
+                nodes_linked_to_selected_node_for_neighborhood.clear();
+                glutPostRedisplay();
+            }
             break;
         }
         case 'c': {
-            cout << "Opción c.\n";
+            if (!validate_neighborhood) {
+                validate_neighborhood = true;
+                cout << "Modo validar vecindad habilitado. Presione 'c' para deshabiliarlo.\n";
+            } else {
+                cout << "Modo validar vecindad deshabilitado.\n";
+                possible_neighbors_selected = 0;
+                validate_neighborhood = false;
+                possible_neighbors.clear();
+            }
             break;
         }
         case 'q':
@@ -234,6 +297,62 @@ GLvoid mouse_click(int button, int state, int x, int y) {
                     cout << "Nodo seleccionado!\n";
                     cout << _node << endl;
                     nodes_to_link.push_back(_node);
+                }
+            }
+        } else if (validate_neighborhood) {
+            for (unsigned i = 0; i < al->size; ++i) {
+                generic_node _node = adj_mat[i][0];
+                if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
+                    cout << "Nodo seleccionado!\n";
+                    cout << _node << endl;
+                    ++possible_neighbors_selected;
+                    possible_neighbors.push_back(_node);
+                    if (possible_neighbors_selected == 2) { // two nodes were selected
+                        generic_node starting_node = possible_neighbors[0];
+                        generic_node neighbor_to_evaluate = possible_neighbors[1];
+                        if (al->is_neighbor(&starting_node, &neighbor_to_evaluate)) {
+                            cout << "Son adyacentes!\n";
+                            return;
+                        } else {
+                            cout << "No son adyacentes!\n";
+                            return;
+                        }
+                    }
+                }
+            }
+        } else if (neighborhood_mode) {
+            for (unsigned i = 0; i < al->size; ++i) {
+                generic_node _node = adj_mat[i][0];
+                if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
+                    cout << "Nodo seleccionado!\n";
+                    cout << _node << endl;
+                    selected_node_for_neighborhood = _node;
+                    nodes_linked_to_selected_node_for_neighborhood = al->nodes_adjacent_to_node(&_node);
+                    //erase node from list
+                    vector<generic_node>::iterator it = std::find(nodes_linked_to_selected_node_for_neighborhood.begin(), nodes_linked_to_selected_node_for_neighborhood.end(), _node);
+                    int index = std::distance(nodes_linked_to_selected_node_for_neighborhood.begin(), it);
+                    nodes_linked_to_selected_node_for_neighborhood.erase(nodes_linked_to_selected_node_for_neighborhood.begin()+index);
+                    //erase node from list
+                    permission_to_draw_neighborhood = true;
+                    glutPostRedisplay();
+                }
+            }
+        } else if (degree_of_node_mode) {
+            for (unsigned i = 0; i < al->size; ++i) {
+                generic_node _node = adj_mat[i][0];
+                if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
+                    if (dirigido) {
+                        if (degree_of_incidence) {
+                            cout << _node << endl;
+                            cout << "Degree of incidence: " << al->node_grade_in_by_value(_node.value) << endl;
+                        } else if (degree_of_outcidence) {
+                            cout << _node << endl;
+                            cout << "Degree of outcidence: " << al->node_grade_out_by_value(_node.value) << endl;
+                        }
+                    } else {
+                        // TODO: call method that counts all incidences (non-directed graph)
+                        // cout << "Degree of node " << al->grade_of_node_by_value(_node.value) << endl;
+                    }
                 }
             }
         } else if (draw_DFS_path) {
@@ -290,8 +409,8 @@ GLvoid mouse_click(int button, int state, int x, int y) {
             for (unsigned i = 0; i < s; ++i) {
                 generic_node _node = adj_mat[i][0];
                 if (_node.coordinate.x == (float)x && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
-                    cout << "NODE ABOUT TO BE DELETED HAS VALUE: " << _node.get_value() << endl;
-                    al->delete_node_by_value(_node.get_value());
+                    cout << "NODE ABOUT TO BE DELETED HAS VALUE: " << _node.value << endl;
+                    al->delete_node_by_value(_node.value);
                     cout << "NODE DELETED" << endl;
                     adj_mat = *(al->adjacency_list);
                     al->print_adjacency_list();
@@ -320,7 +439,7 @@ GLvoid window_display() {
         glPopMatrix();
     }
 
-    /// Esto dibuja las aristas O(Vˆ2)
+    /// Esto dibuja las aristas O(V^2)
 
     for (unsigned i = 0; i < al->size; ++i) {
         generic_node starting_node = adj_mat[i][0]; // get NODE
@@ -341,6 +460,15 @@ GLvoid window_display() {
                 glVertex2f(nodes_for_BFS_or_DFS.first.coordinate.x, nodes_for_BFS_or_DFS.first.coordinate.y);
                 glVertex2f(nodes_for_BFS_or_DFS.second.coordinate.x, nodes_for_BFS_or_DFS.second.coordinate.y);
             glEnd();
+        }
+    } else if (permission_to_draw_neighborhood) {
+        for (auto& n : nodes_linked_to_selected_node_for_neighborhood) {
+            glPushMatrix();
+                // z = 1 para que se dibuje encima
+                glTranslatef(n.coordinate.x, n.coordinate.y, 0);
+                glColor3f(1.0f, 0.0f, 0.0f); // red
+                glutWireSphere(NODE_RADIUS, SPHERE_SLICES, SPHERE_STACKS);
+            glPopMatrix();
         }
     } else if (draw_DFS_path) {
         if (nodes_selected_for_DFS == 2) { // pair is complete, we can access both nodes
@@ -385,7 +513,7 @@ GLvoid draw_graph(int argc, char** argv) {
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT); // define window size
     glutInitWindowPosition(WINDOW_X_POS, WINDOW_Y_POS); // donde se va a renderizar la pantalla
-    glutCreateWindow("Graphos"); // titulo de la pantalla
+    glutCreateWindow("Graph"); // titulo de la pantalla
     initGL(); // crear la ventana cargando la matriz identidad
     glEnable(GL_TEXTURE_2D); // habilitar funciones
     glutDisplayFunc(window_display);
