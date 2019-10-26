@@ -66,6 +66,11 @@ struct Grafo<node_type, dirigido> {
         update_edges();
     }
 
+    float calculate_density(){
+        float aux = edges->size();
+        return (aux/(graph->size*(graph->size-1)));
+    }
+
     void delete_connection_with_addresses(node_type* node_from, node_type* node_to){
         graph->delete_connection_with_adresses(node_from, node_to);
         update_edges();
