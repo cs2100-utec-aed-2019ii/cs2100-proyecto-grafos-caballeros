@@ -1,6 +1,6 @@
 #define _node_type int
 #define generic_node Node<_node_type, Coordinate2D>
-#define _dirigido false
+#define _dirigido true
 #define GL_SILENCE_DEPRECATION
 
 #include "Lectura.h"
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     al->print_adjacency_list();
 
     /// Creando el grafo
-    graph = new Grafo<generic_node, no_dirigido>(al);
+    graph = new Grafo<generic_node, _dirigido>(al);
 
     adj_mat = *(al->adjacency_list);
 
@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
     cout << "Programa terminando..." << endl;
 
     delete al;
+    delete graph;
     delete lector;
 
     return 0;
@@ -167,10 +168,12 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case '4': {
             // TODO: conexo
+            cout << "Es conexo? Nunca lo sabremos...\n";
             break;
         }
         case '5': {
             // TODO: bipartito
+            cout << "Es bipartito? Nunca lo sabremos...\n";
             break;
         }
         case '6': {
@@ -241,6 +244,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case 'b': {
             if (!neighborhood_mode) {
+                // TODO: colocar restriccion de vecindad en cuanto al promedio del weight de las aristas vecinas
                 neighborhood_mode = true;
                 cout << "Modo vecindad de un nodo habilitado. Presione 'b' para deshabilitarlo.\n";
                 cout << "Seleccione un nodo para descubrir su vecindario.\n";
@@ -328,11 +332,6 @@ GLvoid mouse_click(int button, int state, int x, int y) {
                     cout << _node << endl;
                     selected_node_for_neighborhood = _node;
                     nodes_linked_to_selected_node_for_neighborhood = al->nodes_adjacent_to_node(&_node);
-                    //erase node from list
-                    vector<generic_node>::iterator it = std::find(nodes_linked_to_selected_node_for_neighborhood.begin(), nodes_linked_to_selected_node_for_neighborhood.end(), _node);
-                    int index = std::distance(nodes_linked_to_selected_node_for_neighborhood.begin(), it);
-                    nodes_linked_to_selected_node_for_neighborhood.erase(nodes_linked_to_selected_node_for_neighborhood.begin()+index);
-                    //erase node from list
                     permission_to_draw_neighborhood = true;
                     glutPostRedisplay();
                 }

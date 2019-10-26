@@ -39,6 +39,8 @@ struct Grafo<node_type, dirigido> {
         }
     }
 
+
+
     void insert_node(node_type* node){
         graph->insert_node_by_address(node);
     }
@@ -82,10 +84,10 @@ struct Grafo<node_type, dirigido> {
 
 template <typename node_type>
 struct Grafo<node_type, no_dirigido> {
-    AdjacencyList<node_type,vectorized> * graph =  nullptr;
+    AdjacencyList<node_type,vectorized>* graph =  nullptr;
 
 
-    vector< pair<node_type,node_type>  > * edges = new vector< pair<node_type,node_type>  >;
+    vector<pair<node_type,node_type>>* edges = new vector< pair<node_type,node_type>  >;
 
 
     explicit Grafo(AdjacencyList<node_type,vectorized>* mygraph) {
@@ -142,6 +144,8 @@ struct Grafo<node_type, no_dirigido> {
         graph->delete_connection_with_adresses(node_to, node_from);
         update_edges();
     }
+
+
 };
 
 
