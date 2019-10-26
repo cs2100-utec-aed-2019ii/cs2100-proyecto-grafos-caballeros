@@ -1,6 +1,6 @@
 #define _node_type int
 #define generic_node Node<_node_type, Coordinate2D>
-#define dirigido true
+#define _dirigido false
 #define GL_SILENCE_DEPRECATION
 
 #include "Lectura.h"
@@ -18,9 +18,9 @@ GLvoid draw_graph(int argc, char** argv);
 void show_menu();
 
 AdjacencyList<generic_node, vectorized>* al; // adjacency list object
-Lectura<generic_node, Coordinate2D>* lector; // read and save (.vtk format)
+Lectura<generic_node, Coordinate2D, _dirigido>* lector; // read and save (.vtk format)
 vector<vector<generic_node>> adj_mat; // adjacency list
-Grafo<generic_node, dirigido>* graph;
+Grafo<generic_node, _dirigido>* graph;
 
 bool draw_MST_Kruskal = false;
 bool draw_MST_Prim = false;
@@ -44,14 +44,14 @@ int main(int argc, char** argv) {
 
     srand(time(nullptr));
 
-    lector = new Lectura<generic_node, Coordinate2D>();
+    lector = new Lectura<generic_node, Coordinate2D, _dirigido>();
 
     /// Read adjacency list from .vtk
     al = lector->cargar_datos("nodos.vtk");
     al->print_adjacency_list();
 
     /// Creando el grafo
-    graph = new Grafo<generic_node, dirigido>(al);
+    graph = new Grafo<generic_node, no_dirigido>(al);
 
     adj_mat = *(al->adjacency_list);
 
@@ -141,7 +141,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
                 degree_of_node_mode = true;
                 cout << "Modo grado de un nodo activado. Presione 3 para desactivar.\n";
 
-                if (dirigido) {
+                if (_dirigido) {
                     short degree_type;
                     do {
                         cout << "¿Grado de incidencia o outcidencia? [1/2] : ";
@@ -341,7 +341,7 @@ GLvoid mouse_click(int button, int state, int x, int y) {
             for (unsigned i = 0; i < al->size; ++i) {
                 generic_node _node = adj_mat[i][0];
                 if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
-                    if (dirigido) {
+                    if (_dirigido) {
                         if (degree_of_incidence) {
                             cout << _node << endl;
                             cout << "Degree of incidence: " << al->node_grade_in_by_value(_node.value) << endl;
@@ -350,8 +350,8 @@ GLvoid mouse_click(int button, int state, int x, int y) {
                             cout << "Degree of outcidence: " << al->node_grade_out_by_value(_node.value) << endl;
                         }
                     } else {
-                        // TODO: call method that counts all incidences (non-directed graph)
-                        // cout << "Degree of node " << al->grade_of_node_by_value(_node.value) << endl;
+                        cout << _node << endl;
+                        cout << "Degree of node " << al->node_grade_out_by_value(_node.value) << endl;
                     }
                 }
             }
