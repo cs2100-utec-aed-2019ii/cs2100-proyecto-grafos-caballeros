@@ -389,6 +389,63 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 //--------------------------------------------------------------------------NODES LINKED TO NODE
 
+    vector<Node> nodes_adjacent_to_node(Node* nodo){
+        if(search_node_by_address_returns_position(nodo) == -1){ vector<Node> aux1; return aux1; }
+        auto aux = adjacency_list_matrix[search_node_by_address_returns_position(nodo)];
+        aux.erase(aux.begin());
+
+        auto node = nodo->get_value();
+
+        int cont = 0;
+        for (int i = 0; i < size; i++) {
+
+            int pos = -1;
+            int l = 0;
+            int r = adjacency_list_matrix[i].size();
+            if (node > adjacency_list_matrix[i][r - 1].value) {
+                pos = r - 1;
+            } else if (node < adjacency_list_matrix[i][1].value) {
+                pos = 0;
+            } else {
+                while (l <= r) {
+                    int m = l + (r - l) / 2;
+                    if (adjacency_list_matrix[i][m].value == node) {
+                        pos = m;
+                        goto Exit1;
+                    }
+
+                    if (adjacency_list_matrix[i][m].value < node) {
+                        l = m + 1;
+                    }else{
+                        r = m - 1;
+                    }
+                }
+
+                Exit1:
+                if (pos == -1) {}
+                else{
+                    bool esta = false;
+                    for(int j=0; j< aux.size(); j++){
+                        if(aux[j]==adjacency_list_matrix[i][0]){
+                            esta = true;
+                        }
+                    }
+                    if(!esta){
+                        aux.push_back(adjacency_list_matrix[i][0]);
+                    }
+                }
+
+            }
+        }
+
+
+        return aux;
+
+
+
+    }
+
+
     vector<Node> nodes_linked_to_node(Node* node){
         vector<Node> aux;
         bool check = false;
@@ -559,6 +616,8 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
         auto aux1 = node_to->get_value();
 
         delete_connection_with_values(aux, aux1);
+
+
     }
 
 
@@ -642,7 +701,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             --size;
         }
         else if(node == adjacency_list_matrix[size-1][0].value){
-            adjacency_list_matrix.erase(adjacency_list_matrix.end());
+            adjacency_list_matrix.erase(adjacency_list_matrix.end()-1);
             --size;
         }
         else{
@@ -791,6 +850,9 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
         }
         return cont;
     }
+
+
+
 
 
     void print_adjacency_list() {
