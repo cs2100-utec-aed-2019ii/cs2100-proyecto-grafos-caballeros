@@ -110,7 +110,7 @@ struct Node<T, Coordinate2D> {
     }
 
     ~Node() {
-        cout << "HE MUERTO TENGO VALOR: " << value << endl;
+//        cout << "HE MUERTO TENGO VALOR: " << value << endl;
     }
 
 };

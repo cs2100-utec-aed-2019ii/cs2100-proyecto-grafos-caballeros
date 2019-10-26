@@ -304,6 +304,11 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 
     void link_node_by_address(Node* node_from, Node* node_to) {
+
+        if (search_node_by_address_returns_position(node_from) == -1) {
+            cout << "La cagué\n";
+        }
+
         int l = 0;
         int pos = 0;
         int r = size;
@@ -632,7 +637,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             adjacency_list_matrix.erase(adjacency_list_matrix.end());
             --size;
         }
-        else{
+        else {
             int pos = 0;
             int l = 0;
             int r = size;
@@ -673,8 +678,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             else if(node == adjacency_list_matrix[size-1][adjacency_list_matrix[size-1].size()-1].value){
                 adjacency_list_matrix[i].erase(adjacency_list_matrix[i].end());
             }
-
-            else{
+            else {
 
                 int pos = -1;
                 int l = 0;
@@ -723,13 +727,11 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
     }
 
 //--------------------------------------------------------------------------
-
 //--------------------------------------------------------------------------SMALL FUNCTIONS
 
     vector<vector<Node>> get_matrix() {
         return adjacency_list_matrix;
     }
-
 
     void print_adjacency_list() {
         for (int i = 0; i < size; ++i) {
