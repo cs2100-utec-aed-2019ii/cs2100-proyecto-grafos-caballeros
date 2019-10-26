@@ -28,11 +28,11 @@ struct Grafo<node_type, dirigido> {
         update_edges();
     }
 
-    void update_edges(){
+    void update_edges() {
         edges->clear();
-        for(int i =0; i< graph->size ; ++i){
-            if( (graph->get_matrix()[i]).size() > 1 ){
-                for(int j = 1; j < ((*graph->adjacency_list)[i].size()) ; ++j){
+        for(int i =0; i< graph->size ; ++i) {
+            if( (graph->get_matrix()[i]).size() > 1) {
+                for(int j = 1; j < ((*graph->adjacency_list)[i].size()) ; ++j) {
                     edges->push_back( make_pair((*graph->adjacency_list)[i][0] , (*graph->adjacency_list)[i][j]) );
                 }
             }
