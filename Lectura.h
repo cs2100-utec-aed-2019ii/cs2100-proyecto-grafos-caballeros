@@ -35,7 +35,7 @@ struct Lectura<node_type, Coordinate2D, true> {
         }
 
         if (!prev) {
-            string path = "nodos.vtk";
+            string path = vtk_file;
             ifstream myfile(path);
             vector< Node<int, Coordinate2D>* > nodos;
             long cantidad_de_nodos = 0;
@@ -283,7 +283,7 @@ struct Lectura<node_type, Coordinate2D, false> {
         }
 
         if (!prev) {
-            string path = "nodos.vtk";
+            string path = vtk_file;
             ifstream myfile(path);
             vector< Node<int, Coordinate2D>* > nodos;
             long cantidad_de_nodos = 0;

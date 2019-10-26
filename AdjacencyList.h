@@ -459,7 +459,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 
         if ( adjacency_list_matrix[pos].size() == 1){
-            cout << "Node passed has no linked nodes" << endl;
+//            cout << "Node passed has no linked nodes" << endl;
             vector<Node> nonode;
             return nonode;
         }
