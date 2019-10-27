@@ -8,7 +8,6 @@
 #include <iostream>
 #include <random>
 #include <ctime>
-#include <vector>
 
 #include "Macros.h"
 #include "Coordinates.h"
@@ -110,7 +109,7 @@ struct Node<T, Coordinate2D> {
     }
 
     ~Node() {
-        cout << "HE MUERTO TENGO VALOR: " << value << endl;
+//        cout << "HE MUERTO TENGO VALOR: " << value << endl;
     }
 
 };
