@@ -31,7 +31,12 @@ struct Lectura<node_type, Coordinate2D, true> {
             prev = false;
         } else {
             cout << "Existe previo archivo." << endl;
-            prev = true;
+            cout << "Deseas abrir el archivo previo[y/n]: ";
+            char answer;
+            do {
+                cin >> answer;
+            } while (answer != 'y' && answer != 'n');
+            answer == 'y' ? prev = true : prev = false;
         }
 
         if (!prev) {
