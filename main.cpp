@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     lector = new Lectura<generic_node, Coordinate2D, _dirigido>();
 
     /// Read adjacency list from .vtk
-    al = lector->cargar_datos("binary_fire_symbolmesh_image.vtk");
+    al = lector->cargar_datos("100points.vtk");
     al->print_adjacency_list();
 
     /// Creando el grafo

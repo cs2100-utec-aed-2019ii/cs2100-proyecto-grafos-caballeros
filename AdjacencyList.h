@@ -223,7 +223,6 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
             }
         }
 
-        cout << "Node linked" << endl;
     }
 
 
@@ -298,8 +297,6 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
             }
         }
-
-        cout << "Node linked" << endl;
     }
 
     int node_grade_out_by_value(typename node_type::n_type value){
@@ -408,8 +405,6 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
                 adjacency_list_matrix[pos].insert(it, *node_to);
             }
         }
-
-        cout << "Node linked" << endl;
     }
 
 
