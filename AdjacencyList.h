@@ -415,18 +415,25 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 //--------------------------------------------------------------------------
 
+    double euclidean_distance(node_type node1, node_type node2) {
+        double x1 = node1.coordinate.x;
+        double x2 = node2.coordinate.x;
+        double y1 = node1.coordinate.y;
+        double y2 = node2.coordinate.y;
+        return ( sqrt( pow(x2-x1,2) + pow(y2-y1, 2) ) );
+    }
 
 //--------------------------------------------------------------------------NODES LINKED TO NODE
 
-    vector<Node> nodes_linked_to_node(Node* node){
+    vector<Node> nodes_linked_to_node(Node* node) {
         vector<Node> aux;
         bool check = false;
         int pos = -1;
-        if(*node == adjacency_list_matrix[0][0]){
+        if(*node == adjacency_list_matrix[0][0]) {
             aux = adjacency_list_matrix[0];
             pos = 0;
         }
-        else if( *node == adjacency_list_matrix[size-1][0]){
+        else if (*node == adjacency_list_matrix[size-1][0]) {
             aux = adjacency_list_matrix[size-1];
             pos = size-1;
         }
@@ -459,7 +466,7 @@ struct AdjacencyList<node_type, vectorized> { /// ADJACENCY LIST WITH VECTOR
 
 
         if ( adjacency_list_matrix[pos].size() == 1){
-            cout << "Node passed has no linked nodes" << endl;
+//            cout << "Node passed has no linked nodes" << endl;
             vector<Node> nonode;
             return nonode;
         }
