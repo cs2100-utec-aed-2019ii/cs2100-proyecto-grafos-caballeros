@@ -18,7 +18,7 @@ struct Lectura {};
 template <class node_type>
 struct Lectura<node_type, Coordinate2D, true> {
 
-    vector < node_type* > vtk_nodes;
+    vector< node_type* > vtk_nodes;
 
     AdjacencyList<node_type, vectorized>* cargar_datos(const string& vtk_file) {
 
@@ -31,7 +31,12 @@ struct Lectura<node_type, Coordinate2D, true> {
             prev = false;
         } else {
             cout << "Existe previo archivo." << endl;
-            prev = true;
+            cout << "Deseas abrir el archivo previo[y/n]: ";
+            char answer;
+            do {
+                cin >> answer;
+            } while (answer != 'y' && answer != 'n');
+            answer == 'y' ? prev = true : prev = false;
         }
 
         if (!prev) {

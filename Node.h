@@ -101,7 +101,7 @@ struct Node<T, Coordinate2D> {
     }
 
     bool operator==(const Node &rhs) const {
-        return value == rhs.value;
+        return value == rhs.value && id == rhs.id;
     }
 
     bool operator!=(const Node &rhs) const {

@@ -1,6 +1,6 @@
 #define _node_type int
 #define generic_node Node<_node_type, Coordinate2D>
-#define _dirigido true
+#define _dirigido false
 #define GL_SILENCE_DEPRECATION
 
 #include "Lectura.h"
@@ -16,29 +16,60 @@ GLvoid window_display();
 GLvoid window_reshape(GLsizei width, GLsizei height);
 GLvoid draw_graph(int argc, char** argv);
 void show_menu();
+void print_with_color(const string& color, const string& str);
 
 AdjacencyList<generic_node, vectorized>* al; // adjacency list object
 Lectura<generic_node, Coordinate2D, _dirigido>* lector; // read and save (.vtk format)
 vector<vector<generic_node>> adj_mat; // adjacency list
 Grafo<generic_node, _dirigido>* graph;
 
+/// Booleans that help with the different modes in the menu
+
+// Minimum Spanning Trees
 bool draw_MST_Kruskal = false;
 bool draw_MST_Prim = false;
+
+// Breadth First Search and Depth First Search
 bool draw_BFS_path = false;
 bool draw_DFS_path = false;
 bool insert_mode = false;
-bool degree_of_node_mode = false; bool degree_of_incidence = false; bool degree_of_outcidence = false;
-bool neighborhood_mode = false; bool permission_to_draw_neighborhood = false;
-bool validate_neighborhood = false;
-
+pair<generic_node, generic_node> nodes_for_BFS_or_DFS;
 short nodes_selected_for_DFS = 0;
 short nodes_selected_for_BFS = 0;
 
-pair<generic_node, generic_node> nodes_for_BFS_or_DFS;
+// Degree of node
+bool degree_of_node_mode = false; bool degree_of_incidence = false; bool degree_of_outcidence = false;
+
+// Neighborhood of node
+bool neighborhood_mode = false; bool permission_to_draw_neighborhood = false;
+
+// Validation of neighborhood
+bool validate_neighborhood = false;
+
+// Dijkstra and A*
+bool a_star_mode = false;
+bool dijkstra_mode = false;
+bool origin_node_selected = false;
+bool destination_node_selected = false;
+bool draw_a_star_path = false;
+bool draw_dijkstra_path = false;
+vector<generic_node> nodes_for_a_star;
+vector<generic_node> a_star_path;
+vector<generic_node> nodes_for_dijkstra;
+
+// Iterator
+bool iterator_mode = false;
+vector<generic_node> linked_ones;
+vector<generic_node> iterator_path;
+
+// Insertion
 vector<generic_node> nodes_to_link;
+
+// ?
 vector<generic_node> possible_neighbors;
 
 short possible_neighbors_selected = 0;
+generic_node iterating_node;
 
 int main(int argc, char** argv) {
 
@@ -47,8 +78,7 @@ int main(int argc, char** argv) {
     lector = new Lectura<generic_node, Coordinate2D, _dirigido>();
 
     /// Read adjacency list from .vtk
-    al = lector->cargar_datos("binary_fire_symbolmesh_image.vtk");
-    al->print_adjacency_list();
+    al = lector->cargar_datos("100points.vtk");
 
     /// Creando el grafo
     graph = new Grafo<generic_node, _dirigido>(al);
@@ -68,20 +98,22 @@ int main(int argc, char** argv) {
 }
 
 void show_menu() {
-    cout << "--------------------Grapho--------------------\n";
-    cout << "Hacer click en un nodo para eliminarlo.\n";
-    cout << "1. Insertar nodo.\n";
-    cout << "3. Grado de un nodo.\n";
-    cout << "4. Comprobar si el grafo es conexo.\n";
-    cout << "5. Comprobar si el grafo es bipartito.\n";
-    cout << "6. Comprobar si el grafo es denso.\n";
-    cout << "7. MST de Kruskal.\n";
-    cout << "8. MST de Prim.\n";
-    cout << "9. Breadth First Search.\n";
-    cout << "a. Depth First Search.\n";
-    cout << "b. Mostrar vecindad de un nodo.\n";
-    cout << "c. Validar la vecindad de un nodo.\n";
-    cout << "q. Terminar el programa.\n\n";
+    print_with_color("34", "--------------------Grapho--------------------");
+    print_with_color("37", "Hacer click en un nodo para eliminarlo.");
+    print_with_color("37", "1. Insertar nodo.");
+    print_with_color("37", "3. Grado de un nodo.");
+    print_with_color("37", "4. Comprobar si el grafo es conexo.");
+    print_with_color("37", "5. Comprobar si el grafo es bipartito.");
+    print_with_color("37", "6. Comprobar si el grafo es denso.");
+    print_with_color("37", "7. MST de Kruskal.");
+    print_with_color("37", "8. MST de Prim.");
+    print_with_color("37", "a. A*");
+    print_with_color("37", "s. Depth First Search.");
+    print_with_color("37", "b. Mostrar vecindad de un nodo.");
+    print_with_color("37", "c. Validar la vecindad de un nodo.");
+    print_with_color("37", "d. Dijkstra.");
+    print_with_color("37", "i. Iterar.");
+    print_with_color("37", "q. Terminar el programa.");
 }
 
 GLvoid initGL() {
@@ -99,7 +131,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         case '1': {
             if (!insert_mode) {
                 insert_mode = true;
-                cout << "Modo insertar habilitado.\n";
+                print_with_color("32", "Modo insertar habilitado.");
                 _node_type new_value;
                 do {
                     cout << "Valor del nodo: ";
@@ -131,7 +163,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
                 al->print_adjacency_list();
                 nodes_to_link.clear(); // reset auxiliar vector
                 insert_mode = false; // turn off insert mode
-                cout << "Modo insertar deshabilitado.\n";
+                print_with_color("32", "Modo insertar deshabilitado.");
                 glutPostRedisplay(); // re-draw window
                 break;
             }
@@ -140,7 +172,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         case '3': {
             if (!degree_of_node_mode) {
                 degree_of_node_mode = true;
-                cout << "Modo grado de un nodo activado. Presione 3 para desactivar.\n";
+                print_with_color("32", "Modo grado de un nodo activado. Presione 3 para desactivar.");
 
                 if (_dirigido) {
                     short degree_type;
@@ -162,7 +194,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
                 degree_of_node_mode = false;
                 degree_of_incidence = false;
                 degree_of_outcidence = false;
-                cout << "Modo grado de un nodo desactivado.\n";
+                print_with_color("32", "Modo grado de un nodo desactivado.");
             }
             break;
         }
@@ -177,7 +209,7 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
             break;
         }
         case '6': {
-            if (graph->calculate_density() >= 0.9f) {
+            if (graph->calculate_density() >= 0.9f) { // grafo es denso si #nodos es mayor al 90%
                 cout << "El grafo es denso!\n";
             } else {
                 cout << "El grafo no es denso!\n";
@@ -186,13 +218,13 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case '7': { // MST Kruskal: pintar el minimum spanning tree de rojo
             if (!draw_MST_Kruskal) {
-                cout << "Modo MST Kruskal habilitado. Presione 7 para desactivar.\n";
+                print_with_color("32", "Modo MST Kruskal habilitado. Presione 7 para desactivar.");
                 draw_MST_Kruskal = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
             } else {
                 draw_MST_Kruskal = false;
-                cout << "Modo MST Kruskal deshabilitado.\n";
+                print_with_color("32", "Modo MST Kruskal deshabilitado.");
                 // refresh window so that path can be erased from the window
                 glutPostRedisplay();
             }
@@ -200,13 +232,13 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case '8': { // MST Prim: pintar el minimum spanning tree de rojo
             if (!draw_MST_Prim) {
-                cout << "Modo MST Prim habilitado. Presione 8 para desactivar.\n";
+                print_with_color("32", "Modo MST Prim habilitado. Presione 8 para desactivar.");
                 draw_MST_Prim = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
             } else {
                 draw_MST_Prim = false;
-                cout << "Modo MST Prim deshabilitado.\n";
+                print_with_color("32", "Modo MST Prim deshabilitado.");
                 // refresh window so that path can be erased from the window
                 glutPostRedisplay();
             }
@@ -214,29 +246,29 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         }
         case '9': { // BFS: mostrar la secuencia de nodos
             if (!draw_BFS_path) {
-                cout << "Modo BFS habilitado. Presione 9 para desactivar.\n";
+                print_with_color("32", "Modo BFS habilitado. Presione 9 para desactivar.");
                 draw_BFS_path = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
             } else {
                 draw_BFS_path = false;
                 nodes_selected_for_BFS = 0;
-                cout << "Modo BFS deshabilitado.\n";
+                print_with_color("32", "Modo BFS deshabilitado.");
                 // refresh window so that path can be erased from the window
                 glutPostRedisplay();
             }
             break;
         }
-        case 'a': { // DFS: mostrar la secuencia de nodos
+        case 's': { // DFS: mostrar la secuencia de nodos
             if (!draw_DFS_path) {
-                cout << "Modo DFS habilitado. Presione 'a' para desactivar.\n";
+                print_with_color("32", "Modo DFS habilitado. Presione 'a' para desactivar.");
                 draw_DFS_path = true;
                 // refresh window so that path can be drawn
                 glutPostRedisplay();
             } else {
                 draw_DFS_path = false;
                 nodes_selected_for_DFS = 0;
-                cout << "Modo DFS deshabilitado.\n";
+                print_with_color("32", "Modo DFS deshabilitado.");
                 // refresh window so that path can be erased from the window
                 glutPostRedisplay();
             }
@@ -246,10 +278,10 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
             if (!neighborhood_mode) {
                 // TODO: colocar restriccion de vecindad en cuanto al promedio del weight de las aristas vecinas
                 neighborhood_mode = true;
-                cout << "Modo vecindad de un nodo habilitado. Presione 'b' para deshabilitarlo.\n";
-                cout << "Seleccione un nodo para descubrir su vecindario.\n";
+                print_with_color("32", "Modo vecindad de un nodo habilitado. Presione 'b' para deshabilitarlo.");
+                print_with_color("32", "Seleccione un nodo para descubrir su vecindario.");
             } else {
-                cout << "Modo vecindad deshabilitado.\n";
+                print_with_color("32", "Modo vecindad deshabilitado.");
                 permission_to_draw_neighborhood = false;
                 neighborhood_mode = false;
                 nodes_linked_to_selected_node_for_neighborhood.clear();
@@ -260,38 +292,157 @@ GLvoid key_pressed(unsigned char key, int x, int y) {
         case 'c': {
             if (!validate_neighborhood) {
                 validate_neighborhood = true;
-                cout << "Modo validar vecindad habilitado. Presione 'c' para deshabiliarlo.\n";
+                print_with_color("32", "Modo validar vecindad habilitado. Presione 'c' para deshabiliarlo.");
             } else {
-                cout << "Modo validar vecindad deshabilitado.\n";
+                print_with_color("32", "Modo validar vecindad deshabilitado.");
                 possible_neighbors_selected = 0;
                 validate_neighborhood = false;
-                possible_neighbors.clear();
+                possible_neighbors.clear(); // delete all items in vector
             }
             break;
         }
-        case 'q':
+
+        case 'a': {
+            // TODO: no se puede con un nodo que no tiene nodos adyacentes
+            if (!a_star_mode) {
+                a_star_mode = true;
+                print_with_color("32", "Modo A* activado.");
+                print_with_color("32", "Seleccione el nodo origen con el click izquierdo.");
+            } else {
+                a_star_mode = false;
+                origin_node_selected = false;
+                destination_node_selected = false;
+                draw_a_star_path = false;
+                nodes_for_a_star.clear();
+                a_star_path.clear();
+                glutPostRedisplay(); // refresh the window so that the path drawn dissapears
+                print_with_color("32", "Modo A* desactivado.");
+            }
+            break;
+        }
+
+        case 'd': {
+            // TODO: no se puede con un nodo que no tiene nodos adyacentes
+            if (!dijkstra_mode) {
+                dijkstra_mode = true;
+                print_with_color("32", "Modo Dijkstra activado!");
+                print_with_color("32", "Seleccione el nodo origen con el click izquierdo.");
+            } else {
+                dijkstra_mode = false;
+                origin_node_selected = false;
+                destination_node_selected = false;
+                draw_dijkstra_path = false;
+                nodes_for_dijkstra.clear();
+                glutPostRedisplay(); // refresh the window so that the path drawn dissapears
+                print_with_color("32", "Modo Dijkstra desactivado!");
+            }
+            break;
+        }
+
+        case 'i': {
+            if (!iterator_mode) {
+                print_with_color("32", "Modo iteración activado.");
+                iterator_mode = true;
+                iterating_node = adj_mat[int(rand()%al->size)][0]; // iterator begins at random node
+                linked_ones = al->nodes_adjacent_to_node(&iterating_node);
+                iterator_path.push_back(iterating_node);
+                glutPostRedisplay();
+                cout << "Node selected for iterating: " << iterating_node << endl;
+            } else {
+                print_with_color("32", "Modo iteración desactivado.");
+                iterator_mode = false;
+                iterator_path.clear();
+                glutPostRedisplay();
+            }
+            break;
+        }
+
+        case 'q': {
             char respuesta;
-            cout << "¿Quieres guardar el grafo en disco? [y/n]" << endl;
+            print_with_color("31", "¿Quieres guardar el grafo en disco? [y/n]");
             cin >> respuesta;
 
             if (respuesta == 'y') {
                 //al->delete_node_by_value(4);
                 lector->save_adjacency_list(al);
-                cout << "Grafo guardado como nodos_antiguos.vtk." << endl;
+                print_with_color("31", "Grafo guardado como nodos_antiguos.vtk.");
             }
 
             delete lector;
             delete al;
             exit(1);
+        }
         default:
-            cout << "Esa opción no existe!\n";
+            print_with_color("36", "Esa opción no existe!");
             break;
     }
 }
 
+GLvoid key_press(int key, int x, int y) {
+    if (key == GLUT_KEY_LEFT) {
+        cout << "Left arrow key pressed!\n";
+        if (iterator_mode) { // move to max edge
+            iterating_node = graph->min_max(iterating_node).second.first;
+            iterator_path.push_back(iterating_node);
+            linked_ones = al->nodes_adjacent_to_node(&iterating_node);
+            glutPostRedisplay(); // new starting node, redraw screen
+        }
+    }
+
+    if (key == GLUT_KEY_RIGHT) {
+        cout << "Right arrow key pressed!\n";
+        if (iterator_mode) { // move to min edge
+            iterating_node = graph->min_max(iterating_node).first.first;
+            iterator_path.push_back(iterating_node);
+            linked_ones = al->nodes_adjacent_to_node(&iterating_node);
+            glutPostRedisplay(); // new starting node, redraw screen
+        }
+    }
+}
+
 GLvoid mouse_click(int button, int state, int x, int y) {
+
+    if (state == GLUT_DOWN && button == GLUT_RIGHT_BUTTON) {
+        cout << "Right click at x: " << x << " y: " << WINDOW_HEIGHT-y << endl;
+        if (a_star_mode) {
+            if (!destination_node_selected) {
+                for (unsigned i = 0; i < al->size; ++i) {
+                    generic_node _node = adj_mat[i][0];
+                    if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
+                        cout << "Nodo destino seleccionado!\n";
+                        cout << _node << endl;
+                        nodes_for_a_star.push_back(_node);
+                        destination_node_selected = true;
+                        draw_a_star_path = true;
+                        a_star_path = graph->a_star(nodes_for_a_star[0], nodes_for_a_star[1]);
+                        print_with_color("31", "Dibujando el camino de A*...");
+                        glutPostRedisplay(); // refresh window so that the path is drawn
+                        cout << "Presione 'a' cuando haya terminado de visualizar el camino.\n";
+                    }
+                }
+            }
+        } else if (dijkstra_mode) {
+            // TODO: draw dijkstra
+            if (!destination_node_selected) {
+                for (unsigned i = 0; i < al->size; ++i) {
+                    generic_node _node = adj_mat[i][0];
+                    if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
+                        cout << "Nodo destino seleccionado!\n";
+                        cout << _node << endl;
+                        nodes_for_dijkstra.push_back(_node);
+                        destination_node_selected = true;
+                        draw_dijkstra_path = true;
+                        glutPostRedisplay(); // refresh window so that the path is drawn
+                        print_with_color("31", "Dibujando el camino de Dijkstra...");
+                        cout << "Presione 'd' cuando haya terminado de visualizar el camino.\n";
+                    }
+                }
+            }
+        }
+    }
+
     if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
-        cout << "x: " << x << " y: " << WINDOW_HEIGHT-y << endl;
+        cout << "Left click at x: " << x << " y: " << WINDOW_HEIGHT-y << endl;
         // se van a seleccionar dos nodos para buscar su camino
         // no interpretar esa selección como un delete
         if (insert_mode) {
@@ -301,6 +452,32 @@ GLvoid mouse_click(int button, int state, int x, int y) {
                     cout << "Nodo seleccionado!\n";
                     cout << _node << endl;
                     nodes_to_link.push_back(_node);
+                }
+            }
+        } else if (a_star_mode) {
+            if (!origin_node_selected) {
+                for (unsigned i = 0; i < al->size; ++i) {
+                    generic_node _node = adj_mat[i][0];
+                    if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
+                        cout << "Nodo origen seleccionado!\n";
+                        cout << _node << endl;
+                        cout << "Seleccione el nodo destino con el click derecho.\n";
+                        nodes_for_a_star.push_back(_node);
+                        origin_node_selected = true;
+                    }
+                }
+            }
+        } else if (dijkstra_mode) {
+            if (!origin_node_selected) {
+                for (unsigned i = 0; i < al->size; ++i) {
+                    generic_node _node = adj_mat[i][0];
+                    if (_node.coordinate.x == float(x) && _node.coordinate.y == float(WINDOW_HEIGHT-y)) {
+                        cout << "Nodo origen seleccionado!\n";
+                        cout << _node << endl;
+                        cout << "Seleccione el nodo destino con el click derecho.\n";
+                        nodes_for_dijkstra.push_back(_node);
+                        origin_node_selected = true;
+                    }
                 }
             }
         } else if (validate_neighborhood) {
@@ -460,6 +637,49 @@ GLvoid window_display() {
                 glVertex2f(nodes_for_BFS_or_DFS.second.coordinate.x, nodes_for_BFS_or_DFS.second.coordinate.y);
             glEnd();
         }
+    } else if (iterator_mode) {
+        // iterating node's path
+        if (iterator_path.size() >= 2) {
+            for (unsigned i = 0; i < iterator_path.size()-1; ++i) {
+                glBegin(GL_LINES);
+                    glColor3f(1.0f, 0.0f, 0.0f);
+                    glVertex2f(iterator_path[i].coordinate.x, iterator_path[i].coordinate.y);
+                    glVertex2f(iterator_path[i+1].coordinate.x, iterator_path[i+1].coordinate.y);
+                glEnd();
+            }
+        }
+        // draw neighbors
+        for (const auto& n : linked_ones) {
+            cout << "LINKED ONE: " << n << endl;
+            glPushMatrix();
+                glTranslatef(n.coordinate.x, n.coordinate.y, 0);
+                glColor3f(1.0f, 0.0f, 1.0f); // magenta
+                glutWireSphere(4, SPHERE_SLICES, SPHERE_STACKS); // changed node radius
+            glPopMatrix();
+        }
+        // draw iterating node
+        glTranslatef(iterating_node.coordinate.x, iterating_node.coordinate.y, 0);
+        glColor3f(1.0f, 0.0f, 0.0f); // magenta
+        glutWireSphere(4, SPHERE_SLICES, SPHERE_STACKS); // changed node radius
+    } else if (draw_a_star_path) {
+        // TODO: llamar la function que hace A* y dibujar el camino
+        unsigned a_star_path_size = a_star_path.size();
+        if (a_star_path_size >= 2) {
+            for (unsigned i = 0; i < a_star_path_size-1; ++i) {
+                glBegin(GL_LINES);
+                glColor3f(1.0f, 0.0f, 0.0f);
+                glVertex2f(a_star_path[i].coordinate.x, a_star_path[i].coordinate.y);
+                glVertex2f(a_star_path[i+1].coordinate.x, a_star_path[i+1].coordinate.y);
+                glEnd();
+            }
+        }
+    } else if (draw_dijkstra_path) {
+        // TODO: llamar la function que hace Dijkstra y dibujar el camino
+        glBegin(GL_LINES);
+            glColor3f(1.0f, 1.0f, 0.0f);
+            glVertex2f(nodes_for_dijkstra[0].coordinate.x, nodes_for_dijkstra[0].coordinate.y);
+            glVertex2f(nodes_for_dijkstra[1].coordinate.x, nodes_for_dijkstra[1].coordinate.y);
+        glEnd();
     } else if (permission_to_draw_neighborhood) {
         for (auto& n : nodes_linked_to_selected_node_for_neighborhood) {
             glPushMatrix();
@@ -519,7 +739,12 @@ GLvoid draw_graph(int argc, char** argv) {
     glutReshapeFunc(window_reshape);
     glutKeyboardFunc(key_pressed);
     glutMouseFunc(mouse_click);
+    glutSpecialFunc(key_press);
     show_menu();
     glutMainLoop();
     // Unreachable code
+}
+
+void print_with_color(const string& color, const string& str) {
+    cout << "\033[1;" << color << "m"<< str << "\033[0m\n";
 }
